@@ -17,6 +17,8 @@ The first publish of the split was site source `099d192`, flight `1ea3103`, and 
 
 `jpeg-js` in the org folder is an upstream clone. It is not part of the split and was not pushed.
 
+[0SFS/about](https://github.com/0SFS/about) is public. `main` is `3c6f4af`. The empty repository had a ruleset, "Migration publication hold", that blocked every new branch until the check "attribution / Attribution policy" passed. That check cannot run with no branch, so the ruleset was removed and `main` was pushed.
+
 ## How to run it
 
 | | Old app | Development | Whole site, as published |
