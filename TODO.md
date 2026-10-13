@@ -13,8 +13,6 @@ when hover over POI and move mouse into overlaid UI the tooltip remains active u
 
 The split is published. The record, including the FOSS Earth asks and the rules the site depends on, is [repository-split.md](repository-split.md). A person still has to sign off [parity-checklist.md](parity-checklist.md).
 
-**`0SFS/about` is not on GitHub.** The local commit is `3c6f4af`. Every push is rejected: the repository rules forbid creating a branch until the check "attribution / Attribution policy" passes, and that check cannot run while the repository has no branch. The rules are at https://github.com/0SFS/about/rules.
-
 **`browser-testing`'s local branch is not named `main`.** The checkout's branch is `migration/repository-split-20261010` and it tracks `origin/main`. Rename it to `main` so a later pull does not surprise anyone.
 
 **`engine-sound` and `wind-noise` are empty on purpose.** Their code is inside sound. Splitting it means redesigning sound so engine sound and wind noise are sources that plug into it. Search and VR stay deferred too: [proposals/vr.md](proposals/vr.md).

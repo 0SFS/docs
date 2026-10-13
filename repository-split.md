@@ -69,8 +69,6 @@ Search and VR were deferred before the split and stay deferred.
 
 **A person signs off the checklist.** Headless Chrome has loaded the landing page, `/rc/`, and every aircraft (Cessna 172, Vision Jet G1, G2 and G3, F-35B, and forces on for the Cessna and the F-35B) from the assembled site, and the Cessna and F-35B from the development server. Every flight reached ready with no exceptions. The failed requests that also happen in the old app are Mapterhorn elevation tiles returning 404, and NASA night-lights imagery cancelled when the page closes. That is not the human pass in [parity-checklist.md](parity-checklist.md).
 
-**Push `0SFS/about`.** It is committed locally as `3c6f4af` and GitHub still has no branch. The rules reject every new branch until the check "attribution / Attribution policy" has passed, which cannot happen with no branch to check. https://github.com/0SFS/about/rules
-
 **Rename the local `browser-testing` branch to `main`.** Its contents are on `origin/main`. The local branch is still called `migration/repository-split-20261010`.
 
 **Leave `engine-sound` and `wind-noise` empty until sound can take them as sources.** Giving them code is a redesign of sound, not a file move. Both repositories exist and their `main` branches are pushed.
