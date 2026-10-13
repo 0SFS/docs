@@ -9,6 +9,16 @@ when hover over POI and move mouse into overlaid UI the tooltip remains active u
 
 # 0SFS
 
+## repository split
+
+The split is published. The record, including the FOSS Earth asks and the rules the site depends on, is [repository-split.md](repository-split.md). A person still has to sign off [parity-checklist.md](parity-checklist.md).
+
+**`0SFS/about` is not on GitHub.** The local commit is `3c6f4af`. Every push is rejected: the repository rules forbid creating a branch until the check "attribution / Attribution policy" passes, and that check cannot run while the repository has no branch. The rules are at https://github.com/0SFS/about/rules.
+
+**`browser-testing`'s local branch is not named `main`.** The checkout's branch is `migration/repository-split-20261010` and it tracks `origin/main`. Rename it to `main` so a later pull does not surprise anyone.
+
+**`engine-sound` and `wind-noise` are empty on purpose.** Their code is inside sound. Splitting it means redesigning sound so engine sound and wind noise are sources that plug into it. Search and VR stay deferred too: [proposals/vr.md](proposals/vr.md).
+
 ## performance
 
 **Benchmarks must work while the user uses the Mac.** Apply the shared
@@ -244,8 +254,8 @@ visual setup, separate from the current C172 and Vision Jet work.
 load their own JSBSim packages (`sf50`, `sf50-g2`, `sf50-g3`) and the jet sits on
 its own 1.12 m stance, but all three still fly G1-based development
 aerodynamics, and G2+ runs the G2 package. See `developmentNote` in
-`src/flight/aircraft/aircraftCatalog.ts` and the per-variant summaries in
-`src/flight/aircraft/sf50Variants.ts`.
+[fly's fleet](https://github.com/0SFS/fly/blob/main/src/flight/aircraft/fleet.ts) and the per-variant summaries in
+[SF-50's variants](https://github.com/0SFS/SF-50/blob/main/src/sf50Variants.ts).
 
 **The main gear linkage does not articulate.** LOD3 models the trailing link as
 three members - forward leg, trailing arm, oleo - but as one rigid mesh under
@@ -256,7 +266,7 @@ rather than a single rotation. It is a trailing link in shape only.
 **Nothing stops the gear retracting on the ground.** The SF50 packages declare
 retractable gear and run `gear/gear-cmd-norm` through an 8-second kinematic into
 `gear/gear-pos-norm`, so the command now drives the physics: both JSBSim and
-`src/flight/physics/groundContactClearance.ts` stop supporting a retractable
+[ground-contact's clearance](https://github.com/0SFS/ground-contact/blob/main/src/groundContactClearance.ts) stop supporting a retractable
 contact as soon as that position leaves the down stop at 0.99. But the gear
 channel has no weight-on-wheels interlock, so `G` still raises the gear while
 parked. The `gear/wow` tests in `sf50.xml` gate the stall warning and the stick

@@ -1,6 +1,8 @@
 # Repository split specification
 
-Status: draft, 2026-10-08. This is the flight project's coordination proposal
+Status: carried out, 2026-10-12. The migration this proposal describes has been done and published. Where each part lives now, how the site is built, and what is still open are in [repository-split.md](../repository-split.md). This file stays as the proposal it was on 2026-10-08. The paragraphs below were not rewritten when the split landed, so they still speak as if the move had not happened.
+
+This is the flight project's coordination proposal
 for a migration across 0sfs, FOSS Earth and UMN-VR. Shared-world specifications
 remain authoritative in FOSS Earth; campus specifications remain authoritative
 in UMN-VR. New repository destinations below are proposed; this document does
