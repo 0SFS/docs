@@ -1,0 +1,870 @@
+{
+  "schemaVersion": 1,
+  "status": "planning-roster-not-execution-state",
+  "date": "2026-10-08",
+  "coordinatorRole": "coordinator",
+  "rules": [
+    "One assigned writer per checkout; the primary writer owns source removals, application composition and lockfiles.",
+    "Coordinator owns provisioning and remote settings; graph nodes do not prove that remotes exist.",
+    "Deferred TODOs are excluded from provisioning, implementation, current release manifests and migration completion.",
+    "Data-contract graph nodes are not repositories.",
+    "Conditional support changes preserve existing upstream ownership and history."
+  ],
+  "roles": {
+    "coordinator": {
+      "brief": "coordinator-agent.md",
+      "launch": "first",
+      "launchPrompt": "launch-prompts.md#coordinator"
+    },
+    "platform": {
+      "brief": "../../../../foss-earth/docs/proposals/implementation/platform-agent.md",
+      "launch": "initial",
+      "launchPrompt": "launch-prompts.md#platform"
+    },
+    "earth": {
+      "brief": "../../../../foss-earth/docs/proposals/implementation/earth-agent.md",
+      "launch": "initial",
+      "launchPrompt": "launch-prompts.md#earth"
+    },
+    "flight": {
+      "brief": "flight-agent.md",
+      "launch": "initial",
+      "launchPrompt": "launch-prompts.md#flight"
+    },
+    "campus": {
+      "brief": "../../../../UMN-VR/UMN-VR.github.io/docs/proposals/implementation/campus-agent.md",
+      "launch": "initial",
+      "launchPrompt": "launch-prompts.md#campus"
+    },
+    "native-support": {
+      "brief": "native-agent.md",
+      "launch": "conditional-contract-gap",
+      "launchPrompt": "launch-prompts.md#native-sdk-support"
+    },
+    "device-support": {
+      "brief": "device-agent.md",
+      "launch": "conditional-contract-gap",
+      "launchPrompt": "launch-prompts.md#device-support"
+    }
+  },
+  "repositories": [
+    {
+      "repository": "0sfs/.github",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Community contribution documents, policy guidance and repository templates. Generic checks and authorship validators belong to foss-earth/ci; flight-specific workflow composition belongs to 0sfs/ci.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/0sfs.github.io",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Public website and deployment of an explicitly pinned simulator release; no second copy of simulator source.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/about",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Flight-specific About composition, branding and release/dependency manifest content. Consumes the generic FOSS Earth viewer without copying it.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/aircraft",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Shared manifest/schema, catalog and loading contracts, aircraft visual installation and selection panel.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/autopilot",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Hold controller, engagement, modes, pilot takeover, backend contracts, parameter definitions and panel.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/C172",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Current C172P package, propeller and engine references, systems, geometry and validation. Engine identity follows the installed eng_io320.xml.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/ci",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Flight-specific shared workflow composition and test/build orchestration. Consumes generic FOSS Earth CI/authorship machinery; Earth and UMN do not call it.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/controls",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Flight action mapping, keyboard response, assists, flight haptic interpretation and panel contributions. Device handling remains in gamepad-tools.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/dev",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Flight-owned developer/debug panels, accepted-step inspection and flight contribution metadata. Uses the shared FOSS Earth Dev framework.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/dev_installer",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Flight setup/update/doctor entry point and workspace selection. Consumes the generic FOSS Earth installer using the flight-owned manifest.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/docs",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Published architecture/ownership map, integration guides, cross-project specifications and release compatibility docs. Assembles or links versioned component docs.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/engine-sound",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Engine acoustic source plugin consuming accepted engine observations and optional installed family profiles. Registered by the flight host through pure Sound contracts.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/engines",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Common engine contracts, family registration/loading, observations, monitor/instruments, live history and test-stand interface. Family packages register through pure core/schema exports; native algorithms stay in JSBSim.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/exhaust",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Gas optics, plume and smoke rendering, plume depth handling, hot-surface rendering and Exhaust panel.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/F-35B",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "F-35B flight model/systems, assets, powered-lift installation, rigging, fuel/contact geometry, control-law configuration and validation.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/F135",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "F135-specific native definitions/calibration, geometry, installation contracts, acoustic source data, optical tables, provenance and evidence.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/FJ33",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "FJ33 family definitions and supported variants, geometry, optional acoustic/optical capabilities, provenance and validation. A future FJ44 is a separate family.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/fuel",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Fuel panel, read/write/distribution interfaces and external-tank installation. Native fuel and mass dynamics remain in JSBSim.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/g-forces",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Pilot-load interpretation, meter, blackout/redout/consciousness behavior, overlays and panel. Reports pilot availability to host control integration.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/ground-contact",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Aircraft/world contact adaptation, collision queries and response integration. Terrain support queries remain FOSS Earth's; native contact-force laws remain JSBSim's.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/IO320",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Package identity follows the current eng_io320.xml. Preserves definition provenance; future acoustic/optical capabilities must be stated explicitly.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/logging",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Flight data recorder, channels, bounded history, segments/marks, export and Logging panel. Records accepted state and applied controls; the status log belongs to interface.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/logo",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Flight logo generators, source assets, licenses and exported logo artifacts. It does not own FOSS Earth or UMN branding.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/remote-control",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Phone app, pairing, transport/protocol, control sharing, phone settings and camera transport/playout through host adapters.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/research",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Research questions, sources, alternative approaches, experiments and reproducible methods across aircraft/engines. Findings do not qualify a release automatically.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/SF-50",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "SF50 models/generations, systems, assets, FJ33 installation, fuel/contact geometry and validation.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/simulator",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Flight composition, accepted fixed steps, JSBSim adapters, flight cameras, saved-flight lifecycle and final control application.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/sound",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Shared audio runtime, DSP/WASM/worklet host, mixing, propagation, resource limits, Sound panel and pure source-plugin contracts. The application registers source plugins.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "0sfs/vr",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "deferred-todo",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Deferred TODO: aircraft/cockpit VR behavior consuming foss-earth/vr and simulator-supplied pose, control and camera services. No implementation or provisioning in this migration.",
+      "note": "Future work only. Do not provision, implement or add as a dependency during this migration; excluded from completion gates."
+    },
+    {
+      "repository": "0sfs/wind-noise",
+      "owner": "0sfs",
+      "primaryRole": "flight",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Airframe/airflow acoustic source plugin. Receives accepted airflow and airframe observations from the host and consumes pure Sound plugin contracts.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "Felipegalind0/gamepad-tools",
+      "owner": "Felipegalind0",
+      "primaryRole": "device-support",
+      "launch": "conditional-contract-gap",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Controller handling and bindings shared by globe and flight. Flight interpretation remains in controls.",
+      "note": "Keep the existing dependency. Launch its support brief only for a concrete public-contract defect that blocks migration."
+    },
+    {
+      "repository": "Felipegalind0/jsbsim",
+      "owner": "Felipegalind0",
+      "primaryRole": "native-support",
+      "launch": "conditional-contract-gap",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight"
+      ],
+      "scope": "Owned maintained checkout of upstream JSBSim: flight dynamics, native contact/atmosphere/engine work and the verified WASM SDK artifact.",
+      "note": "Keep the existing dependency. Launch its support brief only for a concrete public-contract defect that blocks migration."
+    },
+    {
+      "repository": "foss-earth/.github",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "earth"
+      ],
+      "scope": "FOSS Earth contribution documents and templates; executable shared checks live in foss-earth/ci.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/360",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Top-level 360-image viewer, orb/immersion presentation, entry/exit and motion/input through supplied ports, representation registration and preparation-tool composition.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/about",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Shared build identity/provenance and dependency graph viewer. Reads a host-supplied manifest without importing any described runtime.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/ci",
+      "owner": "foss-earth",
+      "primaryRole": "platform",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Shared reviewed workflows, checks and authorship validator machinery. Each consumer owns a thin pinned workflow entry point and its component-specific tests.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/cubemap",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Six named cube faces, orientation conventions, direction lookup, seam filtering, estimates, preparation and whole-cube loading/sampling.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/dev",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Shared developer-tab plumbing, graph/debug widget services and the ?dev=1 activation contract. Hosts register distinct app-owned developer panels.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/dev_installer",
+      "owner": "foss-earth",
+      "primaryRole": "platform",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Generic setup/update/doctor machinery that reads an explicit versioned workspace manifest. It does not hardcode downstream projects or import their runtime packages.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/docs",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "earth"
+      ],
+      "scope": "Shared globe/module docs, architecture, integration contracts and public documentation. Does not consume flight-owned documentation.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/engine",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Proposed shared globe-engine extraction: terrain, imagery, coordinates, authoritative surface queries, globe camera/input and world integration. It consumes the shared renderer for scene/device/frame services.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/equirectangular",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Full 2:1 spherical image records/schema, direction-to-UV mapping, seam/pole handling, estimates, loading/sampling, preparation and validation.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/foss-earth.github.io",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "earth"
+      ],
+      "scope": "Published globe application and Earth-specific composition, branding, release pins, developer contributions and manifest data.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/images",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Common image identity, decoded records, orientation/color helpers, header validation, transport/cache, cancellation and coordinated resource reservations.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/preview-sheets",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Preview-sheet and placement extension, packing/extraction, file checking, shared sheet reads and fallback to the original six face files.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/renderer",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Shared device/scene lifecycle, WebGPU/WebGL backends, readiness, frame scheduler and optional Renderer panel.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/research",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "earth"
+      ],
+      "scope": "Sky/weather/terrain/panorama studies, alternatives and reproducible comparisons owned by FOSS Earth.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/scenes",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Scene manifest envelope, reference validation, placements, groups/links, navigation orchestration and Scenes panel. Composes the 360 viewer through public interfaces.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/search",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "deferred-todo",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Deferred TODO: shared Search tab for finding registered tabs, settings, actions and feature content in each host. Results open their existing home. Not implemented or provisioned during this migration.",
+      "note": "Future work only. Do not provision, implement or add as a dependency during this migration; excluded from completion gates."
+    },
+    {
+      "repository": "foss-earth/sky",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Shared astronomy, clear atmosphere, stars, physical lighting and optional renderer/panels.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/tiled-cubemap",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Six face quadtrees, tile addressing/LOD/selection, scheduler, cancellation/residency, GPU atlas/display table, preparation and sampling.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/toolbar",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Bottom HUD layout and display of registered callbacks/values. Hosts supply map, position, renderer, input and app-specific items through public contracts.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/ui",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Generic windows/tabs, settings registry/types/widgets, contribution registration, status log and report contracts. Each host registers its own feature catalogs and callbacks.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "foss-earth/vr",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "deferred-todo",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Deferred TODO: shared immersive-session, tracked-view/input and UI/render integration for Earth, UMN and flight. Hosts supply scene/navigation ports. No implementation or provisioning in this migration.",
+      "note": "Future work only. Do not provision, implement or add as a dependency during this migration; excluded from completion gates."
+    },
+    {
+      "repository": "foss-earth/weather",
+      "owner": "foss-earth",
+      "primaryRole": "earth",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "flight",
+        "earth",
+        "campus"
+      ],
+      "scope": "Canonical world weather definition, sampling, sources, optional rendering and shared panel. Aircraft samples and visuals consume one field.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "UMN-VR/.github",
+      "owner": "UMN-VR",
+      "primaryRole": "campus",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "campus"
+      ],
+      "scope": "Club/tour contribution guidance and templates. Thin workflows can call generic FOSS Earth checks with local component tests.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "UMN-VR/about",
+      "owner": "UMN-VR",
+      "primaryRole": "campus",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "campus"
+      ],
+      "scope": "Campus About tab composition, project information, links/credits, authored dependency-graph metadata and adapter for the installed tour release manifest. Consumes the shared FOSS Earth About viewer.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "UMN-VR/dev_installer",
+      "owner": "UMN-VR",
+      "primaryRole": "campus",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "campus"
+      ],
+      "scope": "Campus/club onboarding wrapper: init, doctor, sync and check, full default workspace and explicit component selection. Consumes shared installer machinery and the UMN-owned workspace manifest.",
+      "note": "Implement the campus onboarding wrapper using the pinned shared installer; workspace compatibility data stays owned by the tour."
+    },
+    {
+      "repository": "UMN-VR/docs",
+      "owner": "UMN-VR",
+      "primaryRole": "campus",
+      "launch": "catalog-decision",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "campus"
+      ],
+      "scope": "Tour contributor and user documentation, content preparation, deployments and campus-specific contracts.",
+      "note": "Use a populated UMN catalog or document retention in the owning UMN applications; do not create an empty repository."
+    },
+    {
+      "repository": "UMN-VR/research",
+      "owner": "UMN-VR",
+      "primaryRole": "campus",
+      "launch": "catalog-decision",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "campus"
+      ],
+      "scope": "Campus capture/content studies and accessibility/user findings. Generic panorama rendering research remains FOSS Earth-owned.",
+      "note": "Use a populated UMN catalog or document retention in the owning UMN applications; do not create an empty repository."
+    },
+    {
+      "repository": "UMN-VR/tour",
+      "owner": "UMN-VR",
+      "primaryRole": "campus",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "campus"
+      ],
+      "scope": "Proposed campus-tour runtime extraction: pages, placements, platform-specific import, accessibility, campus branding and app-owned developer contributions.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    },
+    {
+      "repository": "UMN-VR/twin-cities-content",
+      "owner": "UMN-VR",
+      "primaryRole": "campus",
+      "launch": "boundary-decision",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "campus"
+      ],
+      "scope": "Optional independently published scene and photographs. Versioned external hosting can implement the same boundary without another repository.",
+      "note": "Create only if an independent media repository is justified; otherwise record the retained owner and versioned delivery boundary."
+    },
+    {
+      "repository": "UMN-VR/UMN-VR.github.io",
+      "owner": "UMN-VR",
+      "primaryRole": "campus",
+      "launch": "primary-assignment",
+      "remoteStatus": "verify-at-start",
+      "sourceGraphs": [
+        "campus"
+      ],
+      "scope": "UMN VR club landing pages and entry/deployment of a pinned campus-tour release.",
+      "note": "Extract and integrate the existing responsibility according to its owner brief."
+    }
+  ],
+  "contributionPolicy": {
+    "owner": "foss-earth/ci",
+    "rule": "YOU CANNOT HAVE AI AS A CO-AUTHOR, OR YOUR CONTRIBUTIONS WILL BE REJECTED.",
+    "scope": "Every existing or created in-scope repository, including code, docs, research, content/assets, logos, installers, CI, organization-policy repos and owned dependency forks. Deferred targets adopt this when created.",
+    "sharedComponent": [
+      "canonical policy and identity data",
+      "validator",
+      "reusable workflow",
+      "regression fixtures",
+      "consumer-conformance command"
+    ],
+    "perRepositoryAcceptance": [
+      "immutable policy and caller pin",
+      "shared positive/negative conformance result through installed validation entry point",
+      "clean full publication-ref audit",
+      "coordinator-verified required checks and admission/bypass settings"
+    ],
+    "metadataCheckMustRunRegardlessOfChangedPaths": true,
+    "invalidFixtureCommitsMayBePublished": false,
+    "missingRequiredAdoptionReceiptBlocksCompletion": true
+  },
+  "componentLaunchPrompt": "launch-prompts.md#later-component-agent"
+}

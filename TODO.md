@@ -1,0 +1,279 @@
+# foss-earth TODO
+
+
+bugs
+
+when hover over POI and move mouse into overlaid UI the tooltip remains active until the cursor goes over the map again. in other words it only clears the tooltip if the cursor is pointing elsewhere in the map, but if it is over UI it will not clear until the map layer is hovered over again. s
+
+---
+
+# 0SFS
+
+## performance
+
+**Benchmarks must work while the user uses the Mac.** Apply the shared
+[benchmark interference policy](../foss-earth/docs/validation/benchmark-interference.md)
+to aircraft collision, audio and other performance tools. FOSS Earth owns the
+shared recorder and qualification helper; 0sfs consumes it. Preserve raw samples,
+record relevant CPU, memory, thermal and GPU/audio interference, interleave
+comparable candidates, and report accepted counts and uncertainty. Use bounded
+retries; insufficient or unobservable samples stay unqualified. Do not estimate
+isolated performance by subtracting other applications' activity. Ask for
+exclusive time only for a metric that cannot be attributed reliably, and keep
+untimed validation moving meanwhile.
+
+This fanless Mac has heterogeneous P/E cores. Record observable cluster
+residency, migration, effective frequency and thermal pressure, with bounded
+warm-up and drift checks. Core topology and aggregate CPU utilization do not
+identify the core or clock that ran a measurement; exclusive access alone does
+not remove these effects.
+
+The collision experiment already records load, memory pressure and input and
+rejects disturbed rounds. Remaining work is a shared helper, explicit minimum
+sample qualification in each harness, finer measurement windows, thermal and
+relevant GPU/audio observation, paired uncertainty and migration of existing
+benchmarks. See the
+[collision measurements](https://github.com/0SFS/ground-contact/blob/main/docs/validation/collision-geometry-cost-quality.md);
+filtered rounds reduce interference but do not prove isolation.
+
+**Every F-35B test fixture starts the F135 from its design point.** Starting the
+coupled plant takes 304 of the bootstrap's 318 ms, as much work as 3,450 steps.
+The F-35B, F135 and engine test files take two thirds of the suite's test time,
+and `f35b.integration.test.ts` alone takes 35 s. At 5,000 ft, starting the
+plant after a RunIC with the engine stopped took 10.5 ms and ended at the same
+operating point. Compare other conditions, 0 kt among them, then make the start
+fast in JSBSim's plant rather than in the app. Until then, tests could restore a
+started state captured once for each condition, and the long file could be
+split. The measurements are in
+[validation/evidence/ci/2026-10-08](https://github.com/0SFS/fly/blob/main/validation/evidence/ci/2026-10-08/README.md),
+and FOSS Earth's [CI/CD](../foss-earth/docs/ci-cd.md#what-makes-the-tests-slow)
+explains why this matters.
+
+**Frame rate drops close to the ground on approach.** Noticeable enough to
+interfere with landing. Needs profiling before any fix — the plausible causes
+pull in different directions:
+
+- Google 3D Tiles refine hard near the surface; tile loading and mesh creation
+  compete with the render loop exactly when the camera is low and moving.
+- The terrain probe raycasts the scene (`scene.pickWithRay` in
+  `foss-earth/src/terrain/surfaceQuery.ts`) once per physics step, 120 times a
+  second, against every loaded tile mesh. Low altitude means more, finer meshes
+  in range. This is the cheapest thing to test: sample at a lower rate and
+  interpolate, and see whether the drop goes away.
+- Chase camera at low altitude puts more geometry in frustum at full detail.
+
+Measure first — Chrome performance profile plus the tile metrics already
+exposed on `runtime.getTileMetrics()` — and record which of the three it is
+before changing anything.
+
+## flight model
+
+**Turbine initialization and restoration need an explicit state contract.**
+The [implementation plan](https://github.com/0SFS/research/blob/main/turbine-initialization/plan.md) starts with the
+#1505/#1508 shut-off-engine regressions, then separates advancing, refreshing,
+initializing and restoring a turbine. It covers shared calculations, completed
+aircraft trim, real WASM and app recovery. Planned, not implemented; fork.7
+still contains the known regression.
+
+**No aircraft turns on wheel angular state.** The installed JSBSim (fork.7)
+has the wheel spin degree of freedom from PR #1502: spin-up drag at touchdown,
+and brakes that act as a torque on the wheel. A gear only gets it when it
+declares both `wheel_radius` and `wheel_inertia`, and neither the SF50 nor the
+C172 does, so braking is still an instantaneous friction multiplier. The 0sfs
+wheel spin experiment (`docs/wheel-spin-experiment.md`) is sound and haptics
+only and feeds no forces back. `docs/ground-contact.md` still describes the
+engine as lacking this.
+
+It shows on screen too: the tyres spin while touching the ground but stop dead
+the moment they leave it, as if they had no inertia, and jump straight to full
+speed at touchdown. `aircraftAnimation.ts` turns them at ground speed over
+radius only while their gear carries weight, and holds the last angle
+otherwise. Driving them from JSBSim's `wheel-spin-rad_sec` once a gear declares
+the wheel DOF would give them spin-up and run-down.
+
+**Control surface deflection directions are unverified in flight.** Magnitudes
+are verified against the aero tables and against real JSBSim output. If a
+surface moves the wrong way, the fix is the `sign` field in `SURFACE_BINDINGS`
+in `src/flight/aircraft/aircraftAnimation.ts`.
+
+## map
+
+**Root cause of the Google tiles ground fault is still unknown.** The simulator
+now rejects a surface sample that lands more than a kilometre above the aircraft
+or a kilometre above the previous sample, which stops the gear-spring launch it
+used to cause. Why a sample lands there has not been established — the best
+guess is tile geometry being picked before the tile group's transform settles
+under the floating origin. When it happens, the Debug tab logs
+`Ignoring a surface sample …` with the mesh id, revision and tile quality to
+chase it with.
+
+## collision
+
+**The collision overlay shows the C172's geometry on every aircraft.**
+Debug → Collision geometry always draws `BODY_COLLISION_PROBES` and
+`C172_GROUND_CONTACTS`, whatever aircraft is loaded
+(`src/flight/diagnostics/createCollisionDebugOverlay.ts`). The jet's physics
+sweeps `SF50_BODY_COLLISION_PROBES` instead (`bodyProbes` in
+`createFlightSimApp.ts`), and the jet stands on its own package's three gear
+contacts. The panel's legend counts are hard-coded. Its hint, "Shows the current
+C172 physics geometry, including when a different visual aircraft is selected",
+stopped being true when the jet got probes of its own. To fix:
+
+- Hand the overlay the same probe array the physics gets.
+- Read the ground contacts from the loaded package instead of a constant. The
+  test that checks `C172_GROUND_CONTACTS` against `c172p.xml` shows the way.
+- Count the legend from the data.
+- Add a test that fails if the overlay and the physics ever read different
+  arrays.
+
+Do this first: it is how the generator below gets looked at.
+
+**Collision geometry is written by hand for each aircraft.** The jet's six body
+points were read off a three-view, and every other airframe gets five generic
+ones. Nothing checks either list against the mesh. The jet's points are fixed
+offsets from its empty CG, so they shift against the airframe as fuel moves
+the CG. Every aircraft added means another list.
+
+Plan: generate a ladder of complete collision representations from a stable
+aircraft mesh, as one data source shared by physics and the overlay. Select the
+best combinations of bounds, fitted primitives, convex regions and source
+triangle leaves for escalating work, memory and error budgets. Proven plane
+support is a fast path at every budget; it is not a coarse approximation rung.
+
+The [initial proposal](https://github.com/0SFS/ground-contact/blob/main/docs/proposals/generated-collision-geometry.md) needs
+revision around this portfolio rather than a prefix of point rays. The
+[measurements and proposed ladder](https://github.com/0SFS/ground-contact/blob/main/docs/validation/collision-geometry-cost-quality.md#compute-budget-ladder)
+rule out point count as general coverage and leave precise speed rankings
+provisional. Compare semantic part fits and localized refinement next; preserve
+complete coverage, nested bounds and explicit possible-contact results when
+the compute budget ends. Validate rotating/articulated poses, live CG mapping
+and numerical rejection before runtime adoption. Fit cost, runtime work and
+resident memory are separate budgets.
+
+Integrate the jet first; the C172 follows using the same generator and checks.
+
+**The Vision Jet has no structure contacts.** Its packages (`sf50`, `sf50-g2`,
+`sf50-g3`) declare only the three gear contacts. The C172's also declares a nose
+skid, a tail skid and both wing tips. A jet whose wing tip or tail touches the
+runway never reaches JSBSim's ground reactions. Only the swept body points see
+it, and they answer with a rewind and a bounce, not a contact force with
+friction. The proposal above generates these contacts from the mesh, and is
+where to decide whether the packages take them.
+
+## debug views
+
+The rule for all of these comes from the collision overlay: a debug view draws
+the numbers the simulation used this step, read from the same place. It never
+draws a copy kept for drawing. Arrows, markers, labels and strip charts drawn
+over the scene belong to FOSS Earth (its TODO.md, "Debug drawing"). The
+flight's own views are listed here.
+
+**An aero forces overlay, like KSP's.** Debug → Forces now draws native lift,
+drag and side force at the resolved aerodynamic reference point, a separate
+CG aerodynamic contribution, each engine's actual body-force vector at its
+acting point, weight, applied total and net force including gravity, the
+aerodynamic moment about CG as an arc, and each control surface's own terms,
+force and moment, at the reference point. Its scales, caps, labels and label
+refresh are settings. [Aircraft forces](https://github.com/0SFS/aircraft/blob/main/docs/aircraft-forces.md) records the exact
+sources, coordinate conversions and missing-observation fallbacks. Arcs for
+propulsion, ground contact and net moments, and a table of every coefficient
+term, remain to be built.
+
+JSBSim has no parts, so KSP's arrow on each part would be invented here; the
+control surfaces are drawn from their own terms at the reference point, where
+JSBSim applies them. The rest of the split per term is a table. The SF50 package
+names 24 aerodynamic terms under `aero/coefficient/*`, among them `CLalpha`,
+`CLflap`, `CD0`, `CDi` and `CDgear`. A table beside the arrows would give each
+term's share this step.
+
+**A JSBSim property browser.** It would let you:
+
+- search the property tree and see live values;
+- pin properties to a watch list and plot the pinned ones as strip charts;
+- set a value. The change is marked as a change to the simulation, with the old
+  value kept so it can be put back.
+
+FlightGear has one. Nothing in 0SFS shows a property that no panel already
+shows. The property source belongs here; the strip chart belongs to FOSS Earth.
+
+**Time controls.** Pause, step one physics step (1/120 s), and slow motion at a
+rate the user sets on a continuous control. Add a rewind of a few seconds, using
+a ring of the snapshots `captureSimulation` takes (`safeFlightState.ts`);
+nothing keeps a history of them today. Watching a touchdown or a collision at a
+tenth of the speed is how the overlays become readable.
+
+**Control surface labels.** Label each surface with its commanded and actual
+deflection, with an arrow showing which way it should move. This closes
+"Control surface deflection directions are unverified in flight" above, because
+a wrong `sign` would show at once.
+
+**Contact and collision events.** These views would show:
+
+- at each gear contact, the force JSBSim applies (normal and friction), the
+  compression and weight on wheels;
+- at each body hit, the point, the normal, and the velocity before and after,
+  left in the world for a while;
+- the segment each body point swept this step;
+- the surface samples terrain contact used, with `Ignoring a surface sample`
+  events as markers where they happened. This feeds the ground fault under
+  "map".
+
+**Smaller ones:**
+
+- the velocity vector, the relative wind with alpha and beta arcs, and the wind;
+- a trail of the flight path, coloured by speed or load factor;
+- mass and balance: the CG on its envelope, and the fuel in each tank;
+- an opacity setting for the aircraft, so markers inside it read clearly;
+- autopilot targets against actual values, with each controller's terms.
+
+## aircraft
+
+**F-35B retracted gear fit and visibility.** The original wheel-protrusion
+report and stowage-test requirements are in the
+[F-35B aircraft work list](https://github.com/0SFS/F-35B/blob/main/docs/proposals/f35b-fdm.md#deferred-aircraft-work-requested-2026-10-05).
+The source-informed tire pose, independent geometry checks and full-retraction
+render culling with a debug override are implemented. About 2.7 cm of main-leg
+geometry remains outside the selected exterior envelope; real B-specific
+secondary motion and internal bay clearance still need verification.
+
+**Create SR20 and SR22 aircraft models.** Add dedicated SR20 and SR22 aircraft
+variants with their own geometry, flight model tuning, gear/stance settings, and
+visual setup, separate from the current C172 and Vision Jet work.
+
+**Vision Jet generations share one development flight model.** G1, G2 and G3
+load their own JSBSim packages (`sf50`, `sf50-g2`, `sf50-g3`) and the jet sits on
+its own 1.12 m stance, but all three still fly G1-based development
+aerodynamics, and G2+ runs the G2 package. See `developmentNote` in
+`src/flight/aircraft/aircraftCatalog.ts` and the per-variant summaries in
+`src/flight/aircraft/sf50Variants.ts`.
+
+**The main gear linkage does not articulate.** LOD3 models the trailing link as
+three members - forward leg, trailing arm, oleo - but as one rigid mesh under
+one node. The oleo does not compress and the arm does not swing on its knee,
+because each needs a node of its own and a runtime that can drive a chain
+rather than a single rotation. It is a trailing link in shape only.
+
+**Nothing stops the gear retracting on the ground.** The SF50 packages declare
+retractable gear and run `gear/gear-cmd-norm` through an 8-second kinematic into
+`gear/gear-pos-norm`, so the command now drives the physics: both JSBSim and
+`src/flight/physics/groundContactClearance.ts` stop supporting a retractable
+contact as soon as that position leaves the down stop at 0.99. But the gear
+channel has no weight-on-wheels interlock, so `G` still raises the gear while
+parked. The `gear/wow` tests in `sf50.xml` gate the stall warning and the stick
+pusher only. The C172's gear is fixed and its position never moves, but `G` and
+the HUD gear button still toggle the command and the button's own state.
+
+**The Vision Jet's opt-in HD level has no landing gear.** hilos run's Sketchfab
+model ships as the `hd` level, off by default. It is modelled gear-up, so
+parked it hovers 0.67 m over the runway with nothing underneath — right in
+flight, wrong on the ground. Either model a gear for it, hide it while the
+aircraft is on the ground, or leave it as the flight-only option it is.
+
+## branding
+
+**A script that renders the 0SFS logo.** The logo is to be a rendering of a Vision Jet G3
+climbing over the University of Minnesota campus, from a camera position the user has already
+found. The script comes once the G3 model is finished. It needs a way to copy the current
+camera state rather than typing it out by hand. That button belongs to FOSS Earth, since any
+globe application wants to copy or share a view, and is on its TODO.md. The script and the
+logo belong here.
