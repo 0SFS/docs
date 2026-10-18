@@ -74,6 +74,16 @@ Measure first — Chrome performance profile plus the tile metrics already
 exposed on `runtime.getTileMetrics()` — and record which of the three it is
 before changing anything.
 
+**Under-eye terrain LOD and safe-space camera jolts during rapid orbit.**
+When orbiting rapidly or pitching up toward the horizon on mobile/WebGPU devices,
+low-LOD tiles linger and coarse terrain geometry directly beneath the camera eye
+penetrates the safe space sphere (`camera.safeSpace.clearance`, 15 m), triggering
+60 m/s² upward jolts. An opt-in engine fix is available (`map.terrain.robustOrbitLOD`).
+The architecture to decouple view-direction detail from under-eye/aircraft proximity
+detail, enforce independent minimum LOD floors, and separate the 3D renderer detail
+slider from proximity settings is documented in
+[terrain-view-proximity-priority-lod.md](../foss-earth/docs/proposals/terrain-view-proximity-priority-lod.md).
+
 ## flight model
 
 **Turbine initialization and restoration need an explicit state contract.**
