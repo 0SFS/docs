@@ -64,7 +64,7 @@ Search and VR were deferred before the split and stay deferred.
 - In development, Vite stamps `?v=` on some imports of a linked file and not on others, so the file can load twice and split a registry. fly's `oneUrlPerSourceFile()` in `vite.config.ts` strips that stamp. A crawl of the dev server found each of 907 modules under one URL. The workaround belongs in FOSS Earth's `localSource()` eventually.
 - The landing page's `images/hero.png` is not published. Nothing on the page references it.
 - Relative Markdown links that the split broke were rewritten: same repository, a new relative path; another repository, `https://github.com/0SFS/<repo>/blob/main/<path>` (or `tree/main` for a directory). 654 links were repaired. 94 were already broken in the monolith and were left. The repair tools are in fly's gitignored `build/split/split-tools/` (`broken-links.mjs`, `fix-doc-links.mjs`).
-- Package versions stay `0.1.0`. The org names commits `YY.MM.DD.#N`, which does not fit npm's version field.
+- Package versions stay `0.1.0`. The org names commits `YY.MM.DD#N`, which does not fit npm's version field.
 - `tsconfig.test.json` is not what `npm test` runs. Under it, the same 40 errors exist as before the landing-page move. Some rc phone tests are excluded there because of other uncommitted work; the note in that file points here.
 
 ## Left to do
