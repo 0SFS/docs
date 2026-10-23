@@ -84,6 +84,24 @@ detail, enforce independent minimum LOD floors, and separate the 3D renderer det
 slider from proximity settings is documented in
 [terrain-view-proximity-priority-lod.md](../foss-earth/docs/proposals/terrain-view-proximity-priority-lod.md).
 
+**Do not draw the world the cockpit covers.** In the cockpit view the
+aircraft's own opaque meshes hide much of the screen, and in a headset more,
+but the terrain, tiles and sky behind them are still drawn in full. Later,
+once the cost is measured (the GPU frame profile in the cockpit view against
+the same frame in the chase view):
+
+- Draw the opaque cockpit first, with depth, so the GPU's early depth test
+  rejects the world's pixels behind it. Babylon clears depth between rendering
+  groups unless told not to; the canopy glass and other transparent parts still
+  draw last.
+- Or mark the cockpit in the stencil buffer and draw the world only outside it.
+- Skip loading and drawing 3D tiles whose screen-space box lies wholly behind
+  the cockpit's silhouette for the current look.
+
+The cockpit screen's chase view (`fly/src/flight/cockpit/cockpitScreen.ts`)
+draws the world a second time in the cockpit view, by default only on the
+fastest computers. This saving would pay for part of it.
+
 ## flight model
 
 **Turbine initialization and restoration need an explicit state contract.**
