@@ -7,7 +7,7 @@ Published on 12 October 2026. This is where the monolith went, how the live site
 | | |
 |---|---|
 | Monolith | Private [0SFS/monolith](https://github.com/0SFS/monolith). `main` is the app from before the split. Its `gh-pages` branch is the old published history, not the live site. |
-| Flight | [0SFS/fly](https://github.com/0SFS/fly). It composes the packages and serves `/fly/` and `/rc/`. It is private, as are the package repositories created for the split (`ci`, `controls`, `exhaust`, `fuel`, `ground-contact`, `logging`, `rc`, and the others that were already private). |
+| Flight | [0SFS/fly](https://github.com/0SFS/fly). It composes the packages and serves `/fly/` and `/rc/`. The package repositories created for the split (`ci`, `controls`, `exhaust`, `fuel`, `ground-contact`, `logging`, `rc`, and the others) sit beside it. |
 | Site | Public [0SFS/0SFS.github.io](https://github.com/0SFS/0SFS.github.io). `main` is the landing page and the scripts that assemble a fly build. GitHub Pages serves `gh-pages`, which is the built site: landing page, flight and phone controller. |
 | Live | https://0sfs.github.io/ , https://0sfs.github.io/fly/ and https://0sfs.github.io/rc/ |
 

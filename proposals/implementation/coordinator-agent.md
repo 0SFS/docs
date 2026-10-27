@@ -79,8 +79,9 @@ into published package dependencies or become the only copy of source.
 
 Create destination repos only for the reviewed roster and useful first slices.
 Resolve existing remote-name collisions by inspecting ownership/content; never
-overwrite or delete an existing remote to make provisioning convenient. Record
-visibility explicitly; do not expose private source/metadata during extraction.
+overwrite or delete an existing remote to make provisioning convenient. Create
+every new 0SFS repository public; do not expose credentials or personal data during
+extraction.
 Do not create empty research/catalog/media repos solely to satisfy a graph node.
 Resolve those nodes to a populated repo or a documented retained owner.
 
