@@ -9,6 +9,8 @@ The monolith split is published. [repository-split.md](repository-split.md) is w
 [Aircraft damage](proposals/aircraft-damage.md) records the implemented whole-aircraft health model and the candidate cost/realism tradeoffs. The [physical component design](proposals/aircraft-damage-physical.md) covers impacts, systems, structural failure and JSBSim coupling.
 The [local acceptance record](validation/aircraft-health-2026-10-25.md) covers health, synchronized model selection, host permissions and review instructions.
 
+[Downloadable app ideas](proposals/downloadable-app.md) collects what only a downloadable app could do, such as turning and zooming at once on a Mac trackpad. No app is planned.
+
 ## Community
 
 - [Code of conduct](https://github.com/0SFS/.github/blob/main/CODE_OF_CONDUCT.md)
