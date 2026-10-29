@@ -388,8 +388,8 @@ Still to build, in this order:
 2. Mesh to four, shared time of day and weather, mixed aircraft, local pause.
 3. The multiplayer tab, including the opt-in client check and its reports.
 4. Optional push-to-talk.
-5. WebTransport server that relays through the server watcher. Hybrid uses
-   the same watcher on a 10 Hz copy.
+5. Hybrid mode, using the same watcher on a 10 Hz copy. The WebTransport
+   relay itself now admits poses before fan-out.
 
 Hit rewind lands with the F-35B's stores.
 

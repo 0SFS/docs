@@ -804,6 +804,16 @@ recorded next to it; they are not parity failures by themselves.
 - [ ] KD-11: the bug report's GitHub issue target is `0SFS/fly`, which the build records with its commit. The reference build had none (KD-03).
 - [ ] KD-12: publishing changed. The website's `npm run deploy` assembles fly's build with the landing page and refuses a fly build with uncommitted or unpushed changes. The monolith's `npm run deploy` published `dist/` with `gh-pages`, which fly no longer depends on. Nothing has been deployed.
 
+## 360° drone mod
+
+Not in the old app. The aircraft are mods, absent until added.
+
+- [x] Chrome WebGPU: Mods tab, This computer, add `0SFS/DJI-Mini2` (remove a previously saved GitHub copy first). The gallery gains a DJI family. The network shows `/dev-mods/` manifest JSON and does not request the drone feature chunk or HD asset.
+- [x] Chrome WebGPU: Apply Mini 2. The network then requests the feature chunk and `dji-mini-2.xml`. Physics runs at 120 Hz. Auto draws the local HD model nearby and the procedural silhouette beyond 15 m.
+- [x] Chrome WebGPU: Mini 2 and Air 2S retain visible geometry through HD/procedural/HD zoom transitions. Their camera minimums are 0.25 m and 0.35 m respectively; repeated Auto refreshes do not remount the same procedural mesh.
+- [ ] Shutter and 360 require WebGPU. A WebGL renderer shows "360° capture requires WebGPU." and does not read the canvas.
+- [ ] Remove the mod. The flight returns to the Cessna 172 and the gallery loses the family.
+
 ## Out of scope
 
 - [ ] OOS-01: Search: Earth's place search and anything beyond what the flight needs to place the aircraft (the Location tab search box EARTH-LOC-02, Interface → Search EARTH-IFACE-04, the lookup cache PERSIST-10) is deferred. There was no separate Search tab in the old flight (SHELL-13). See AMB-03 for the airport presets that depend on it.

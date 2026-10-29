@@ -6,7 +6,7 @@ Prepared 22 October 2026. Scope: the local 0SFS, FOSS Earth and UMN-VR workspace
 
 This report extends the existing [shared documentation-system proposal](/Users/felg/gh/foss-earth/docs/docs/proposals/documentation-system.md:1), especially its agent experience, schemas and freshness checks. It adds a concrete defect backlog, operating contracts, evaluation cases and an adoption sequence. The suggested interfaces and examples below are proposed designs. The user requested a report; implementation of the recommendations is a subsequent activity.
 
-**The audit covered the instruction inventory and selected workflows across all three organizations.** It counted agent entry files, inspected shared policies and repository overlays, compared guidance with manifests and source, and examined the existing context helper and link checker. Three parallel reviews covered the individual workspaces. Detailed reading concentrated on startup, ownership, tests, native work, tour content and handoffs. This was a documentation and source audit; it did not establish application correctness or measure agent speedups.
+**The audit covered the instruction inventory and selected workflows across all three organizations.** It counted agent entry files, inspected shared policies and repository overlays, compared guidance with manifests and source, and examined the existing context helper and link checker. Three parallel reviews covered the individual workspaces. Detailed reading concentrated on startup, ownership, tests, WASM work, tour content and handoffs. This was a documentation and source audit; it did not establish application correctness or measure agent speedups.
 
 | Local organization directory | Direct child Git checkouts | AGENTS.md files | CLAUDE.md files | Total AGENTS.md bytes |
 | --- | ---: | ---: | ---: | ---: |
@@ -41,7 +41,7 @@ Acceptance: launch a fresh session from each organization container, a represent
 | [Setup guidance](/Users/felg/gh/foss-earth/docs/setup.md:6) names the website as the globe app and `0sfs/simulator` as Flight. It also lists `check:conformance` and `check:attribution`, which are absent from the [current Docs manifest](/Users/felg/gh/foss-earth/docs/package.json:25). | Setup and verification instructions can fail in the current checkout. | Identify the current owner and distinguish currently available commands from commands requiring a prepared release/tooling environment. |
 | [Tour guidance](/Users/felg/gh/UMN-VR/tour/docs/agent-reference.md:3) resolves `README.md` and `docs/...` relative to its own `docs/` location. | Several local task routes lead to nonexistent paths. | Repair relative targets and check links from their actual source document location. |
 | [Tour scene instructions](/Users/felg/gh/UMN-VR/tour/docs/agent-reference.md:13) recommend full `build:scene`; the [README](/Users/felg/gh/UMN-VR/tour/README.md:119) documents removed dependencies and provides `--poses-only`, followed by `campus-scenes`. | A content change can trigger a known failing media rebuild. | Route placement edits to the working narrow command and expose the full rebuild's blocker. |
-| [Native instructions](/Users/felg/gh/foss-earth/native/AGENTS.md:12) say threaded/shared builds are unimplemented; the [native README](/Users/felg/gh/foss-earth/native/README.md:14) documents the integrated threaded sky path. | An agent can plan redundant work or reason from an obsolete capability limit. | Keep the durable parity rules in AGENTS and move mutable capability status into a source-backed record. |
+| The former shared Rust workspace's `AGENTS.md` said threaded/shared builds were unimplemented while its README documented the integrated threaded sky path. The cores have since moved to each owner's `*-WASM/` folder; the shared build is now described in [sky-WASM's README](/Users/felg/gh/foss-earth/sky/sky-WASM/README.md:25). | An agent can plan redundant work or reason from an obsolete capability limit. | Keep the durable parity rules in AGENTS and move mutable capability status into a source-backed record. |
 | [Flight scripts](/Users/felg/gh/0sfs/fly/package.json:27) allow `--passWithNoTests`. Libraries such as [Autopilot](/Users/felg/gh/0sfs/autopilot/README.md:5) rely on the host application's test runner. | A successful exit can be mistaken for verification of the changed library. | Record the runner owner, explicit scope, and observed test count; distinguish an empty selection from a passing test run. |
 | [Flight split guidance](/Users/felg/gh/0sfs/docs/repository-split.md:33) requires installation with `--ignore-scripts`; [Fly's README](/Users/felg/gh/0sfs/fly/README.md:12) gives a plain install route. | Setup can invoke lifecycle effects that another current guide says to avoid. | Resolve the intended install contract with the owner and generate command references from that decision. |
 | [A performance handoff](/Users/felg/gh/UMN-VR/tour/docs/performance-next-agent.md:3) describes a request's authorization for autonomous work and long testing. | A future agent may carry task-specific permission into a different task. | Record that authorization as historical session context and require current scope to determine actions. |
@@ -133,7 +133,7 @@ Store observed duration, machine and workload when measured. Until then, leave c
 | Local behavior | Focused tests that exercise the changed behavior; test count and scope | Shared contract, unexpected failures or coverage gap |
 | Cross-repository API | Provider contract checks plus an affected consumer check | Multiple consumers or packaging changes |
 | Visible UI | Relevant behavior check and inspected cropped screenshots | Device/backend-specific behavior |
-| Native/WASM behavior | Reference parity and requested/actual backend reporting | Changed threading, lifecycle or integration behavior |
+| WASM behavior | Reference parity and requested/actual backend reporting | Changed threading, lifecycle or integration behavior |
 | Performance improvement | Comparable before/after workload, preserved quality, environment and raw results | Hardware-specific or system-wide claims |
 | Release readiness | The owner's release checks and immutable source/artifact records | Publication-specific requirements |
 
@@ -151,7 +151,7 @@ Turn repeated failures into concise troubleshooting records: symptom, discrimina
 
 **10. Use skills for repeatable procedures with clear triggers.** The absence of repository skills is an opportunity to assess, not a defect by itself. A task index or short local instruction may be sufficient. A skill becomes useful when a recurring workflow has stable inputs, several failure-prone steps, supporting scripts and a clear output contract.
 
-Candidate workflows include browser screenshot review, device feedback preparation, native parity checks and cross-repository consumer qualification. Start with the one causing the most repeated intervention. Wrap existing tools and guides rather than copying their implementation into a skill.
+Candidate workflows include browser screenshot review, device feedback preparation, WASM parity checks and cross-repository consumer qualification. Start with the one causing the most repeated intervention. Wrap existing tools and guides rather than copying their implementation into a skill.
 
 For tool-dependent workflows, identify required capabilities and a supported fallback. Keep tool schemas, executable help and versioned adapters authoritative for changing arguments. Document authentication prerequisites and actionable failure handling without embedding secrets or assuming every host has the same connectors. A missing optional integration should lead to a named alternative; an essential missing capability should produce a precise blocker.
 
@@ -231,7 +231,7 @@ Adopt a revision when qualified completion and safeguards remain acceptable and 
 
 | Priority | Work item | Primary owner | Effort | Acceptance evidence |
 | --- | --- | --- | --- | --- |
-| P1 | Repair owner, setup, tour links, scene route and native-status contradictions | Docs and affected repository maintainers | Small | Current source agrees with every repaired route; route checks pass |
+| P1 | Repair owner, setup, tour links, scene route and WASM-status contradictions | Docs and affected repository maintainers | Small | Current source agrees with every repaired route; route checks pass |
 | P1 | Define startup behavior for workspace containers and isolated clones | Shared installer with organization policy owners | Medium | Fresh-session discovery matrix passes |
 | P1 | Separate historical task authorization from current policy | Handoff and workflow owners | Small | Old-handoff evaluation preserves current scope |
 | P1 | Define runner ownership and empty-test handling | Fly/Tour and component maintainers | Small–medium | Component task runs relevant tests or reports an explicit evidence gap |

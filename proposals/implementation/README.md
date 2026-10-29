@@ -1,5 +1,11 @@
 # Parallel implementation of the repository split
 
+The repository split is published. These briefs are historical launch notes
+from 2026-10-08, not a current procedure. Where the split stands now is
+[repository-split.md](../../repository-split.md). The paragraphs below are the
+launch kit as written, so their links still name the roles and gates from that
+date.
+
 Status: launch specifications, 2026-10-08. These briefs describe implementation;
 writing them has not launched the migration or created the target repositories.
 The [split specification](../repository-split.md), [combined tab inventory](../tab-inventory.md)

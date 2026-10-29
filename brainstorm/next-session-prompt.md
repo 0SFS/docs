@@ -8,12 +8,12 @@ I am fixing the phone side of 0SFS (`/Users/felg/gh/0sfs`). A real iPhone
 session just found four defects. Read these two files first — they are the whole
 brief, written by the previous session:
 
-- `docs/ux/2026-09-17-iphone-session.md` — what happened on the device, in order
-- `docs/brainstorm/ios-url-bar-and-scrolling.md` — causes, dead ends, and the
+- [2026-09-17 iPhone session](https://github.com/0SFS/rc/blob/main/docs/ux/2026-09-17-iphone-session.md) (`rc/docs/ux/2026-09-17-iphone-session.md` in the 0SFS checkout) — what happened on the device, in order
+- [iOS URL bar and scrolling](https://github.com/0SFS/rc/blob/main/docs/brainstorm/ios-url-bar-and-scrolling.md) (`rc/docs/brainstorm/ios-url-bar-and-scrolling.md`) — causes, dead ends, and the
   options already considered for each fix
 
 Then read `AGENTS.md` (scratch goes in the gitignored `build/`, never `/tmp`;
-never start a dev server unless I ask) and `docs/phone-controller-ui.md` (the
+never start a dev server unless I ask) and [phone-controller-ui.md](https://github.com/0SFS/rc/blob/main/docs/phone-controller-ui.md) (`rc/docs/phone-controller-ui.md`; the
 one rule: the phone controller is the desktop HUD rearranged, so control
 appearance belongs in the shared `src/styles/flightControls.css`).
 
@@ -77,11 +77,11 @@ Apple takes. Do not rewrite, soften or duplicate that copy. The flight page is
 not React, so decide between a small React root for the popup or the same strings
 rendered as DOM, and keep one source of words for both hosts. If you think any
 claim in it is wrong, say so and leave it alone; the reasoning and the list of
-which claims are dated is in `docs/brainstorm/iphone-fullscreen-popup.md`.
+which claims are dated is in [iphone-fullscreen-popup.md](https://github.com/0SFS/rc/blob/main/docs/brainstorm/iphone-fullscreen-popup.md) (`rc/docs/brainstorm/iphone-fullscreen-popup.md`).
 
 ## House rules for this session
 
-- No hidden reasoning blocks. Put working notes in `docs/brainstorm/` where I
+- No hidden reasoning blocks. Put working notes in [rc/docs/brainstorm/](https://github.com/0SFS/rc/tree/main/docs/brainstorm) where I
   can read and correct them.
 - Do not start a dev server unless I ask. Give me the command and I will run it.
 - After each item: `npx vitest run`, `npx tsc -p tsconfig.app.json --noEmit`,

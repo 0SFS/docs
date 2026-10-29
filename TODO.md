@@ -104,6 +104,12 @@ fastest computers. This saving would pay for part of it.
 
 ## flight model
 
+**The drone flight model's open work is tracked stage by stage in its
+[roadmap](proposals/360-drone-flight-model-roadmap-2026-10-28.md).** Two of its
+decisions are open: 5, 120 or 480 Hz, and 7, WASM or TypeScript in
+production. The [session note](proposals/360-drone-session-2026-10-28.md) lists
+the smaller items, including an unchecked spawn height for the drones.
+
 **Turbine initialization and restoration need an explicit state contract.**
 The [implementation plan](https://github.com/0SFS/research/blob/main/turbine-initialization/plan.md) starts with the
 #1505/#1508 shut-off-engine regressions, then separates advancing, refreshing,
