@@ -216,7 +216,7 @@ No still or complete 360 sequence was taken. `jpeg-js` remains in `optimizeDeps.
 
 ## Model and zoom follow-up
 
-The checkout is now `DJI-Mini2`, added as `0SFS/DJI-Mini2`; its internal aircraft/JSBSim ID remains `dji-mini-2`. Downloaded models for Mini 2 and Air 2S are organized under their respective `3d_model/HD/` directories. Each `npm run prepare:hd` creates a centered local runtime GLB in metres. Both models are by yigeshichen, CC BY-NC 4.0, credited on the HD choice and ignored by Git.
+The checkout is now `DJI-Mini2`, added as `0SFS/DJI-Mini2`; its internal aircraft/JSBSim ID remains `dji-mini-2`. The official DJI 3D models for Mini 2 and Air 2S are organized under their respective `3d_model/HD/` directories. Each `npm run prepare:hd` creates a centered local runtime GLB in metres. The HD choice credits each as "Official DJI 3D model", and the files are ignored by Git.
 
 Auto no longer remounts procedural geometry on every camera refresh. The model loader owns its disposer and switches cleanly between HD below 15 m and procedural geometry farther away. Model paths resolve relative to the installed mod's base URL. Camera defaults now come from each aircraft: Mini 2 minimum 0.25 m; Air 2S minimum 0.35 m; both near clip 0.01 m. Explicit Camera settings take precedence.
 

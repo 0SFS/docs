@@ -806,9 +806,9 @@ recorded next to it; they are not parity failures by themselves.
 
 ## 360° drone mod
 
-Not in the old app. The aircraft are mods, absent until added.
+Not in the old app. The drones are mods in the default modpack (since 29 October; before that they were absent until added).
 
-- [x] Chrome WebGPU: Mods tab, This computer, add `0SFS/DJI-Mini2` (remove a previously saved GitHub copy first). The gallery gains a DJI family. The network shows `/dev-mods/` manifest JSON and does not request the drone feature chunk or HD asset.
+- [ ] Chrome WebGPU: open `/fly/`. The gallery has the DJI family with Mini 2 and Air 2S, and About lists them under `0sfs/default-modpack`. The network does not request the drone feature chunk, drone JSBSim XML or HD asset.
 - [x] Chrome WebGPU: Apply Mini 2. The network then requests the feature chunk and `dji-mini-2.xml`. Physics runs at 120 Hz. Auto draws the local HD model nearby and the procedural silhouette beyond 15 m.
 - [x] Chrome WebGPU: Mini 2 and Air 2S retain visible geometry through HD/procedural/HD zoom transitions. Their camera minimums are 0.25 m and 0.35 m respectively; repeated Auto refreshes do not remount the same procedural mesh.
 - [ ] Shutter and 360 require WebGPU. A WebGL renderer shows "360° capture requires WebGPU." and does not read the canvas.

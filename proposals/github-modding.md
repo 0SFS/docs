@@ -3,6 +3,13 @@
 Status: specification and implementation plan, 27 October 2026.
 Applies to `0SFS/fly`, `0SFS/aircraft`, `0SFS/engines`, `0SFS/stores`, `0SFS/fuel`, `0SFS/exhaust`, `0SFS/sound`, `0SFS/about`, `0SFS/0SFS.github.io`, the existing aircraft/engine repositories (`0SFS/C172`, `0SFS/SF-50`, `0SFS/F-35B`, `0SFS/IO320`, `0SFS/FJ33`, `0SFS/F135`), and the new per-item payload repositories (`0SFS/AIM-120`, `0SFS/GBU-12`, `0SFS/GBU-32`, `0SFS/AIM-9X`, `0SFS/ASRAAM`, `0SFS/Paveway-IV`, `0SFS/GAU-22-pod`, `0SFS/F-35B-external-tank`).
 
+> **Amendment, 29 October 2026: components and modpacks.** Two kinds join `aircraft`, `engine`, `payload` and `plugin`:
+>
+> - **`component`**: a part other mods share, such as a propeller (`0SFS/rotating-prop`), a gimbal (`0SFS/camera-gimbal`), a camera (`0SFS/drone-camera`, `0SFS/DJI-FC7303`, `0SFS/DJI-FC3411`), a flight model (`0SFS/multirotor`) or an airframe layer (`0SFS/Quadcopter`, `0SFS/DJI-Quadcopter`). It contributes data an aircraft mod depends on.
+> - **`modpack`**: mods installed together. It lists them in `dependencies` and carries no content of its own; `mods/src/schema.ts` refuses a modpack with any content key.
+>
+> Everything the flight starts with is a mod, brought in by **`0SFS/default-modpack`**: the C172, SF-50, F-35B, DJI Mini 2 and DJI Air 2S aircraft mods and the `0SFS/camera-preview` plugin. The aircraft bring in their engines, payloads and components. fly links the pack and every mod it brings in; `scripts/link-packs.mjs` writes them into `fly/src/flight/mods/bundledMods.ts`, and the mods session installs the pack before the flight reads the aircraft selection. Bundled manifests load with no fetch, and the pack's mods cannot be removed. The sections below predate this amendment where they list four kinds.
+
 > **Active WIP Boundary:** `@0sfs/ground-contact` (ground collisions) is actively being worked on in a separate effort. **Do not inspect, modify, or refactor `@0sfs/ground-contact`** during this migration. Where `FdmProfile.bodyCollisionProbes` is read in `fly/src/flight/jsbsim/fdmProfiles.ts`, retain the existing imported references or provide a pass-through default without touching `ground-contact`.
 
 ---
@@ -110,7 +117,7 @@ Every mod serves a `0sfs-mod.json` file at its root (or `public/0sfs-mod.json` i
 ### 4.1 TypeScript Schema Definition
 
 ```ts
-export type ModKind = "aircraft" | "engine" | "payload" | "plugin";
+export type ModKind = "aircraft" | "engine" | "component" | "payload" | "plugin" | "modpack";
 export type ModExecutionMode = "declarative" | "wasm" | "js";
 
 export interface ModDependencySpec {
@@ -278,7 +285,8 @@ Users and mod `dependencies` arrays may specify a mod in any of these forms:
 
 In `fly/src/flight/createFlightSimApp.ts`, `createAboutPanel` reads `#foss-earth-built-from`.
 - Extend the About integration so that all active mods appear in the About dependency graph (`parts`), structured identically to `BuiltFromNode`:
-  - Each active aircraft or top-level plugin mod is listed with its `name`, `from: "mod"`, `version`, `commit`, `repository`, and `history`.
+  - Each top-level mod (the default modpack, then any mod added on top of it) is listed with its `name`, `from: "mod"`, `version`, `commit`, `repository`, and `history`.
+  - Every dependency appears under the mod that needs it: the pack's aircraft and plugins under the pack, and engines, payloads and components under the aircraft.
   - Its engine and payload `dependencies` (`0SFS/F135`, `0SFS/F-35B-external-tank`, `0SFS/AIM-120`, `0SFS/GBU-12`, `0SFS/GBU-32`, `0SFS/AIM-9X`, `0SFS/ASRAAM`, `0SFS/Paveway-IV`, `0SFS/GAU-22-pod`) appear as nested `parts` under the aircraft mod.
   - Shared dependencies (e.g. `0SFS/AIM-120` used by two aircraft mods) expand their subtree on first appearance and render as a compact deduplicated reference on subsequent appearances.
 
@@ -289,7 +297,7 @@ In `fly/src/flight/createFlightSimApp.ts`, `createAboutPanel` reads `#foss-earth
 ### 7.1 GitHub Topic Tagging & Unauthenticated Discovery
 - Every `0SFS` mod and template repository must be tagged with GitHub topics:
   - Universal topic: **`0sfs-mod`**
-  - Kind topic: **`0sfs-aircraft`**, **`0sfs-engine`**, **`0sfs-payload`**, or **`0sfs-plugin`**
+  - Kind topic: **`0sfs-aircraft`**, **`0sfs-engine`**, **`0sfs-component`**, **`0sfs-payload`**, **`0sfs-plugin`**, or **`0sfs-modpack`**
 - The **Mods** tab includes a **Browse GitHub Mods** section that queries:
   `GET https://api.github.com/search/repositories?q=topic:0sfs-mod&sort=stars&order=desc&per_page=30`
 - Results are cached in `sessionStorage` (with a 10-minute TTL and ETag support) so normal tab switches never hit GitHub's 60 req/hr unauthenticated rate limit.
@@ -375,7 +383,7 @@ Each selectable weapon, pod, and external fuel tank is extracted into its own de
    - Add a **Mods** tab in the simulator's tabbed interface showing:
      1. **Installed Mods & Dependency Tree** (Aircraft $\to$ Engines & Individual Payloads)
      2. **Add Mod by URL / GitHub Shorthand** (with ownership check & Security Warning modal)
-     3. **Browse GitHub Mods (`topic:0sfs-mod`)** (filterable by `All`, `Aircraft`, `Engines`, `Payloads`, `Plugins`)
+     3. **Browse GitHub Mods (`topic:0sfs-mod`)** (filterable by `All`, `Aircraft`, `Engines`, `Components`, `Payloads`, `Plugins`, `Modpacks`)
      4. **Share Modded Flight Link** (`?mods=...`)
 
 ---
