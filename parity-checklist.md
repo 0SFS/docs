@@ -83,7 +83,7 @@ Sources: `src/appRoute.ts`, `src/main.tsx`, `index.html`, `vite.config.ts`,
 ### URL parameters on /fly/
 
 - [ ] URL-01: `?report` (any value) on `/fly/` shows only the bug-report form, without starting the simulator. (`src/main.tsx` wantsReportOnly/showReportOnly; Earth-owned form)
-- [ ] URL-02: `?set.<parameter id>=<value>` sets any registered parameter for this visit, flight ones included, e.g. `?set.osfs.aircraft.id=f-35b`, `?set.osfs.start.latitude=…&set.osfs.start.longitude=…`, `?set.osfs.start.heading=90`. The parameter shows its URL provenance in Settings. (`foss-earth:src/settings/appSettings.ts`, URL prefix `set.` in `@foss-earth/ui/settings`)
+- [ ] URL-02: `?set.<parameter id>=<value>` sets any registered parameter for this visit, flight ones included, e.g. `?set.osfs.aircraft.id=f-35b` (short form `?aircraft=f-35b`), `?set.osfs.start.latitude=…&set.osfs.start.longitude=…`, `?set.osfs.start.heading=90`. The parameter shows its URL provenance in Settings. (`foss-earth:src/settings/appSettings.ts`, URL prefix `set.` in `@foss-earth/ui/settings`)
 - [ ] URL-03: an addressed start (`set.osfs.start.latitude` or `set.osfs.start.longitude` from the URL) overrides "Resume last flight": the flight starts at the addressed position, not the saved flight. (`src/flight/createFlightSimApp.ts` addressedStart)
 - [ ] URL-04: `?engineTest=1` opens the engine test stand (the selected aircraft held down at MSP runway 35 threshold, heading 350, standard atmosphere, zero wind, no assists; cold and stopped). `&engineStart=running` starts it with the engine running. Neither is saved; leaving the stand removes both parameters. (`src/flight/engineTestStand.ts`, `createFlightSimApp.ts` ~L1235)
 - [ ] URL-05: `?flightPerf=1` enables the stutter trace (Debug tab "Stutter trace" metrics, Copy performance trace, `window.osfsFlightPerformance` in DevTools). Without it Debug shows "Open the simulator with flightPerf=1 in the URL to capture stutters." (`src/flight/diagnostics/flightPerformanceCapture.ts`, `FlightControlPanel.tsx` FlightPerformancePanel)
@@ -809,7 +809,7 @@ recorded next to it; they are not parity failures by themselves.
 Not in the old app. The drones are mods in the default modpack (since 29 October; before that they were absent until added).
 
 - [ ] Chrome WebGPU: open `/fly/`. The gallery has the DJI family with Mini 2 and Air 2S, and About lists them under `0sfs/default-modpack`. The network does not request the drone feature chunk, drone JSBSim XML or HD asset.
-- [x] Chrome WebGPU: Apply Mini 2. The network then requests the feature chunk and `dji-mini-2.xml`. Physics runs at 120 Hz. Auto draws the local HD model nearby and the procedural silhouette beyond 15 m.
+- [x] Chrome WebGPU: Apply Mini 2. The network then requests the feature chunk and `dji-mini2.xml`. Physics runs at 120 Hz. Auto draws the local HD model nearby and the procedural silhouette beyond 15 m.
 - [x] Chrome WebGPU: Mini 2 and Air 2S retain visible geometry through HD/procedural/HD zoom transitions. Their camera minimums are 0.25 m and 0.35 m respectively; repeated Auto refreshes do not remount the same procedural mesh.
 - [ ] Shutter and 360 require WebGPU. A WebGL renderer shows "360° capture requires WebGPU." and does not read the canvas.
 - [ ] Remove the mod. The flight returns to the Cessna 172 and the gallery loses the family.

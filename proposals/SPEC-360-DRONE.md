@@ -11,6 +11,13 @@ Targets for the manual checks in the last section: Firefox on an M5 MacBook Air,
 
 ## 0. Decisions already made
 
+### Flight controls update — 29 October 2026
+
+The main flight screen and paired phone default to DJI Mode 2: the four-motor engines instrument is the left climb/descent-and-yaw joystick, and the attitude indicator is the right pitch-and-roll joystick. Motor readings stay fixed while a command marker follows the input. Up on the left commands positive climb; up on the right commands positive forward pitch. Both axes spring to zero on release. The desktop Engine details button is separate from the motor joystick.
+
+Plane and drone attitude-side preferences are saved separately on each device; planes default left, drones right. Swapping sides moves the whole control cluster. Mini 2 and Air 2S declare no flaps, pitch/roll trim or landing-gear control. Aircraft capability metadata permits future drones to expose those controls individually. Phone motor readings are an optional sibling status extension, so existing drone telemetry remains compatible. These rules supersede the earlier plain-stick layout and clickable compact motor face described below.
+
+
 1. **The drones are declarative mods in the default modpack.** Repository content lives in `Quadcopter/`, `DJI-Quadcopter/`, `DJI-Mini2/`, and `DJI-Air-2S/`. fly links them, and `scripts/link-packs.mjs` writes the pack's mods into `fly/src/flight/mods/bundledMods.ts`. `installBuiltinMods.ts` registers only the pack's aircraft in `AIRCRAFT_IDS` when `fleet.ts` loads. The drones join the catalog when `ensureModsSession()` installs the pack, before the saved aircraft selection is read.
 2. **Installing the drones fetches no code and no flight data.** Their manifests are bundled. Installing registers the gallery entries. It does not import the flight code, does not fetch JSBSim XML, and does not start a capture pipeline.
 3. **JSBSim XML is fetched only when a drone flight is booted**, through the existing `hydrateModJsbsimData` (`fly/src/flight/jsbsim/hydrateJsbsimData.ts`), from the mod `baseUrl`.
@@ -145,7 +152,7 @@ On reload, `createFlightSimSession` awaits `ensureModsSession()` before reading 
 | `Quadcopter/` | `0sfs/quadcopter` | plugin | `0SFS/rotating-prop`, `0SFS/camera-gimbal` | Stick `kPos` and deadzone, position-hold speed, grid overlap, gimbal slew, rotor wrench and arming property names, 120 Hz |
 | `DJI-Quadcopter/` | `0sfs/dji-quadcopter` | plugin | `0SFS/Quadcopter` | Gallery family id `dji-quadcopter`, mount roll stabilization |
 | `DJI-Mini2/` | `0sfs/dji-mini2` | aircraft | `0SFS/DJI-Quadcopter`, `0SFS/DJI-FC7303` | Mini 2 flight modes, propeller, rotor layout, CG, controller gains, mount limits, JSBSim XML (mass, inertia, feet, body drag), controls, one gallery variant |
-| `DJI-Air-2S/` | `0sfs/dji-air-2s` | aircraft | `0SFS/DJI-Quadcopter`, `0SFS/DJI-FC3411` | Air 2S flight modes, propeller, rotor layout, CG, controller gains, mount limits, JSBSim XML (mass, inertia, feet, body drag), controls, one gallery variant |
+| `DJI-Air-2S/` | `0sfs/dji-air2s` | aircraft | `0SFS/DJI-Quadcopter`, `0SFS/DJI-FC3411` | Air 2S flight modes, propeller, rotor layout, CG, controller gains, mount limits, JSBSim XML (mass, inertia, feet, body drag), controls, one gallery variant |
 
 Each aircraft manifest carries the family with only its own variant. `registerAircraftMod` appends a variant when the family already exists, so installing both drones yields one DJI family with two variants. `thumbnail.path` stays `""`.
 
@@ -248,7 +255,7 @@ This is the only drone module the startup graph imports. Allowed imports: none f
 
 ```typescript
 export const DRONE_MOD_ID = "0sfs/dji-quadcopter";
-export const DRONE_AIRCRAFT_IDS = ["dji-mini-2", "dji-air-2s"] as const;
+export const DRONE_AIRCRAFT_IDS = ["dji-mini2", "dji-air2s"] as const;
 export type DroneAircraftId = (typeof DRONE_AIRCRAFT_IDS)[number];
 
 export function isDroneAircraftId(id: string): id is DroneAircraftId {
@@ -404,7 +411,7 @@ Locked outputs, which a unit test recomputes from the function rather than hard-
 
 | | Mini 2 | Air 2S |
 | --- | --- | --- |
-| id | `dji-mini-2` | `dji-air-2s` |
+| id | `dji-mini2` | `dji-air2s` |
 | massKg | 0.249 | 0.595 |
 | sensorPx | 4000 × 3000 | 5472 × 3648 |
 | diagonal FOV | 83° | 88° |
@@ -489,11 +496,11 @@ Babylon `camera.fov` is the vertical FOV in radians. Set it to `vfovRad`. Set `c
 
 ### 4.2 FDM profile JSON
 
-Both profiles share this shape. `model` is the JSBSim file stem (`dji-mini-2`, `dji-air-2s`).
+Both profiles share this shape. `model` is the JSBSim file stem (`dji-mini2`, `dji-air2s`).
 
 ```json
 {
-  "model": "dji-mini-2",
+  "model": "dji-mini2",
   "dataSource": { "kind": "mod", "modId": "0sfs/dji-mini2" },
   "kinematic": "drone-pgps",
   "requiresPhysicsHz": 120,
@@ -535,7 +542,7 @@ Aircraft definitions:
 
 ```json
 {
-  "id": "dji-mini-2",
+  "id": "dji-mini2",
   "familyId": "dji-quadcopter",
   "label": "DJI Mini 2",
   "summary": "249 g camera drone. 4:3 stills, gimbal −90° to +20°.",
@@ -652,7 +659,7 @@ Constants used by both:
 
 | Token | Mini 2 | Air 2S |
 | --- | --- | --- |
-| DRONE_ID | dji-mini-2 | dji-air-2s |
+| DRONE_ID | dji-mini2 | dji-air2s |
 | CG_X | -0.0022 | 0.003 |
 | EMPTY_LBS | 0.548951 | 1.311750 |
 | IXX_SLUG / IYY_SLUG / IZZ_SLUG | 0.0002360 / 0.0003202 / 0.0005113 | 0.0012118 / 0.0016566 / 0.0026545 |
@@ -834,6 +841,8 @@ At −90° pitch the sensor looks down. The camera itself has one `RotationYawPi
 
 Follow-up on 28 October: Mini 2's checkout and mod source are `DJI-Mini2` / `0SFS/DJI-Mini2`. Its internal aircraft and JSBSim ID remains `dji-mini-2`. The dev server retains the old `/dev-mods/dji-mini-2/` alias for saved sources.
 
+Follow-up on 29 October: the aircraft and JSBSim IDs are `dji-mini2` and `dji-air2s`, and the Air 2S mods are `0sfs/dji-air2s` and `0sfs/dji-air2s-propulsion`. Saved settings, saved flights and links with the old IDs open the renamed aircraft, and the dev server keeps the old `/dev-mods/` names. `?aircraft=dji-mini2` selects one for a visit.
+
 Both aircraft have an HD level made from the official DJI 3D models. Source files live under each checkout's `3d_model/HD/`; `npm run prepare:hd` preserves the source and writes a centered runtime GLB in metres under `public/3d_model/HD/`. The model files stay ignored by Git. The flight build links the prepared GLBs, so the default modpack ships them on the site. The level's credit reads "Official DJI 3D model." Mini 2 has 109,470 triangles; Air 2S has 142,400. Auto uses HD below 15 m and the procedural level at or above 15 m. An explicit LOD choice is also supported.
 
 `AircraftDefinition.camera` supplies camera defaults through the existing settings registry, with pilot overrides retained. Mini 2 starts 0.8 m behind and 0.24 m above its origin, with a 0.25 m minimum distance. Air 2S starts 1.1 m behind and 0.33 m above, with a 0.35 m minimum. Both use a 0.01 m near clip and 500 m maximum distance. Ordinary aircraft restore the normal camera defaults.
@@ -902,7 +911,7 @@ Inside `status()`, after the existing checks: if `value.drone` is present and is
 ```typescript
 export interface DroneTelemetry {
   available: true;
-  droneId: "dji-mini-2" | "dji-air-2s";
+  droneId: "dji-mini2" | "dji-air2s";
   yawAngleDeg: number;
   gimbalPitchDeg: number;
   gimbalRollDeg: number;
@@ -923,7 +932,7 @@ Commands ride on `ControlFrame` as optional `drone`. Malformed `drone` is delete
 
 ```typescript
 export interface DroneCommand {
-  droneId: "dji-mini-2" | "dji-air-2s";
+  droneId: "dji-mini2" | "dji-air2s";
   pitch: number;
   roll: number;
   vertical: number;
@@ -1350,8 +1359,8 @@ The sequence commands the controller by replacing `DroneStickCommand.yawMode`, `
 | `.github/AGENTS.md` | Phase 0 row | yes, docs |
 | `docs/parity-checklist.md` | Phase 0 section | yes, docs |
 | `Quadcopter/`, `DJI-Quadcopter/`, `DJI-Mini2/`, `DJI-Air-2S/` `public/0sfs-mod.json` | Declarative manifests (section 3.1; `quad` and `quadcopter` data in section 4.1) | fetched on mod add |
-| `DJI-Mini2/public/jsbsim-data/aircraft/dji-mini-2/dji-mini-2.xml` | XML, section 4.3 | fetched on drone boot |
-| `DJI-Air-2S/public/jsbsim-data/aircraft/dji-air-2s/dji-air-2s.xml` | XML, section 4.3 | fetched on drone boot |
+| `DJI-Mini2/public/jsbsim-data/aircraft/dji-mini2/dji-mini2.xml` | XML, section 4.3 | fetched on drone boot |
+| `DJI-Air-2S/public/jsbsim-data/aircraft/dji-air2s/dji-air2s.xml` | XML, section 4.3 | fetched on drone boot |
 | `Quadcopter/README.md`, `DJI-Quadcopter/README.md`, `DJI-Mini2/README.md`, `DJI-Air-2S/README.md` | What each mod owns and that the flight chunk stays in fly | no |
 | `aircraft/src/aircraftIds.ts` | register/unregister family and aircraft ids | yes, tiny |
 | `aircraft/src/aircraftCatalog.ts` | `procedural`, revision, unregister | yes, tiny |
@@ -1385,7 +1394,7 @@ The sequence commands the controller by replacing `DroneStickCommand.yawMode`, `
 | `drone-camera/src/flowEstimator.ts` | section 7.4 | lazy |
 | `drone-camera/src/sphericalGrid.ts` | section 8.1 | lazy |
 | `drone-camera/src/captureSequence.ts` | section 8.2 | lazy |
-| `fly/vite.config.ts` | static serve each mod `public/` at `/dev-mods/quadcopter`, `/dev-mods/dji-quadcopter`, `/dev-mods/dji-mini2`, `/dev-mods/dji-air-2s` | dev only |
+| `fly/vite.config.ts` | static serve each mod `public/` at `/dev-mods/quadcopter`, `/dev-mods/dji-quadcopter`, `/dev-mods/dji-mini2`, `/dev-mods/dji-air2s` | dev only |
 | `fly/package.json` | `jpeg-js` file dependency | the chunk, not a static import from `main.tsx` |
 | `rc/src/protocol.ts` | availability predicate and optional fields | yes, small |
 | `rc/src/drone/droneProtocol.ts` | command types and builders | lazy on both ends |
@@ -1415,8 +1424,8 @@ Add `modSession` coverage in the existing mods tests: add a declarative fixture,
 Manual, M5 MacBook Air, Firefox. Start with `cd ~/gh/0sfs/fly && npm run dev`. Do not use a background server left by the agent.
 
 1. Open `/fly/`. DevTools network: no request contains `droneFeature` or `0sfs-mod.json` for drones. The aircraft gallery has the DJI family with Mini 2 and Air 2S. About lists `0sfs/default-modpack` with the drones under it.
-2. No drone chunk and no drone JSBSim XML has been fetched. JSBSim XML is fetched from the app root (`/jsbsim-data/aircraft/dji-mini-2/`) when the aircraft is applied, not at startup.
-3. Apply Mini 2. Network then shows `dji-mini-2.xml` and the drone chunk. The physics log line `Fixed-step rate` reads `physicsHz: 120`. The airframe is the HD model nearby and the procedural silhouette beyond 15 m, never the Cessna. First-person view does not roll with the airframe when the stick is pushed; the horizon stays level and the gimbal pitch changes only from the gimbal control.
+2. No drone chunk and no drone JSBSim XML has been fetched. JSBSim XML is fetched from the app root (`/jsbsim-data/aircraft/dji-mini2/`) when the aircraft is applied, not at startup.
+3. Apply Mini 2. Network then shows `dji-mini2.xml` and the drone chunk. The physics log line `Fixed-step rate` reads `physicsHz: 120`. The airframe is the HD model nearby and the procedural silhouette beyond 15 m, never the Cessna. First-person view does not roll with the airframe when the stick is pushed; the horizon stays level and the gimbal pitch changes only from the gimbal control.
    Flight:
    - **On the ground.** A drone applied on the ground sits on its feet with the ARM gauge off and the rotors stopped. Push the climb stick over half to arm: the rotors spin and it lifts off.
    - **Hover.** Centered sticks hold position and height. The engine widget shows four simulated RPMs near hover: about 9,000 for the Mini 2 and 6,200 for the Air 2S at sea level.

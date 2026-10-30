@@ -53,8 +53,8 @@ the same force/moment request
 The XML has mass, inertia, a belly contact and external reactions. It has no
 `<propulsion>` element and its six aerodynamic coefficient functions are zero.
 The three external forces use `frame="LOCAL"`; the three direct moments use
-`frame="BODY"`. See the [Mini 2 XML, lines 20–71](../../DJI-Mini2/public/jsbsim-data/aircraft/dji-mini-2/dji-mini-2.xml#L20)
-and the [Air 2S XML](../../DJI-Air-2S/public/jsbsim-data/aircraft/dji-air-2s/dji-air-2s.xml#L20).
+`frame="BODY"`. See the [Mini 2 XML, lines 20–71](../../DJI-Mini2/public/jsbsim-data/aircraft/dji-mini2/dji-mini2.xml#L20)
+and the [Air 2S XML](../../DJI-Air-2S/public/jsbsim-data/aircraft/dji-air2s/dji-air2s.xml#L20).
 JSBSim defines LOCAL as north/east/down, independently of aircraft orientation;
 BODY is forward/right/down. Its external-force facility legitimately accepts
 arbitrary forces; the calling aircraft model must decide which forces are
@@ -197,7 +197,7 @@ behavioral protections, not a contact or rotor model. They also remove drag
 alongside commanded acceleration.
 
 The XML has a single structural belly spring/contact, not separate landing-leg
-contacts ([Mini 2 XML, lines 27–37](../../DJI-Mini2/public/jsbsim-data/aircraft/dji-mini-2/dji-mini-2.xml#L27)).
+contacts ([Mini 2 XML, lines 27–37](../../DJI-Mini2/public/jsbsim-data/aircraft/dji-mini2/dji-mini2.xml#L27)).
 
 **Correction:** keep contact reaction, landing logic, aerodynamic loads and
 motor effort distinct. A landing controller can reduce descent demand or

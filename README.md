@@ -6,11 +6,21 @@ Catalog of this repository. Pages are sorted the way the shared convention descr
 
 ## Current
 
+[Modding](modding.md) explains how to find and install mods, choose discovery
+topics, and publish aircraft, engines, components, payloads, plugins and modpacks.
+
 The monolith split is published. [repository-split.md](repository-split.md) is where things stand and what is left. [parity-checklist.md](parity-checklist.md) is the human check against the old app. Open follow-up is in [TODO.md](TODO.md), the working backlog (split leftovers, performance, flight model, map, collision, debug views, aircraft and branding, plus one FOSS Earth tooltip note).
 
 [Choosing the useful peaks of realism and cost](realism-cost.md) explains why we compare multiple simulation implementations and how we retain the choices that justify their resource and maintenance costs.
 
 [software-dependency-graph.md](software-dependency-graph.md) separates distributable software from live services and creative assets, and records the installed JSBSim fork.7 package.
+
+The [resource administration reference](https://github.com/0SFS/fly/blob/main/docs/resources/README.md)
+documents the flight app end to end: main-thread execution, frame times, memory,
+worker CPU, GPU, network, persistent storage and audio. Each guide links the
+owning implementation and explains controls, limits, cleanup, observability and
+efficiency tradeoffs. Its source audit is dated 29 October 2026; historical
+measurements remain linked in their original records.
 
 [AGENTS.md](AGENTS.md) points at the shared agent rules in `0SFS/.github`.
 

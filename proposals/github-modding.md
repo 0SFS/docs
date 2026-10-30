@@ -46,7 +46,7 @@ However, to modders and general pilots, **"stores" is ambiguous** (easily confus
 ### Naming Decision
 - **Template Repository Name:** `0SFS/mod-template-payload`
 - **Mod Manifest Kind:** `"kind": "payload"`
-- **GitHub Discovery Topic:** `0sfs-payload` (alongside `0sfs-mod`)
+- **GitHub Discovery Topic:** `0sfs-payload-mod` (alongside `0sfs-mod`)
 - **Internal Simulator Boundary:**
   - `@0sfs/stores` and `@0sfs/fuel` remain the internal runtime/UI packages that render the Armament and Fuel panels and write JSBSim `stores/*` and `propulsion/tank[*]` properties.
   - Each **`payload` mod repository** represents **one payload item** (one missile, bomb, gun pod, or external fuel tank) and registers its physical/visual definition into `@0sfs/stores` or `@0sfs/fuel` at runtime.
@@ -103,10 +103,10 @@ All four templates must be created as public GitHub template repositories (`gh r
 
 | Template Repository | `kind` | GitHub Topics | Default Execution Mode | Included Scaffolding & CI |
 | :--- | :--- | :--- | :--- | :--- |
-| **`0SFS/mod-template-aircraft`** | `"aircraft"` | `0sfs-mod`, `0sfs-aircraft` | `"declarative"` (optional `"wasm"` for FBW/control laws) | `public/0sfs-mod.json`, `public/aircraft/<id>/*.glb`, `public/jsbsim-data/aircraft/<id>/*.xml`, station/hardpoint & loadout preset config, optional `crates/control-law/` Rust crate, validation script, GitHub Pages deploy workflow. |
-| **`0SFS/mod-template-engine`** | `"engine"` | `0sfs-mod`, `0sfs-engine` | `"declarative"` (optional `"wasm"` for FADEC) | `public/0sfs-mod.json`, `public/jsbsim-data/engine/*.xml`, optional `public/aircraft/<id>/engine/*.glb` (`full` + `installed`), nozzle rig & exhaust optical/gas support definitions, rotor blade counts, acoustic profile. |
-| **`0SFS/mod-template-payload`** | `"payload"` | `0sfs-mod`, `0sfs-payload` | `"declarative"` (optional `"wasm"` for guidance/ballistics) | Single-item payload template (for one weapon, bomb, missile, pod, or external fuel tank): `public/0sfs-mod.json`, optional `public/payloads/<key>/*.glb` (or procedural cylinder/box dimensions), mass, drag area, capacity/rounds, and provenance notices. |
-| **`0SFS/mod-template-plugin`** | `"plugin"` | `0sfs-mod`, `0sfs-plugin` | **`"wasm"` (Rust default)**; `"js"` fallback documented separately | `Cargo.toml` (`crate-type = ["cdylib"]`, `wasm32-unknown-unknown`, zero-allocation `#![no_std]`-friendly guest SDK), `public/0sfs-mod.json`, `public/mod.wasm`, GitHub Action that compiles Rust $\to$ `.wasm`, verifies exports, and publishes to GitHub Pages. |
+| **`0SFS/mod-template-aircraft`** | `"aircraft"` | `0sfs-mod`, `0sfs-aircraft-mod` | `"declarative"` (optional `"wasm"` for FBW/control laws) | `public/0sfs-mod.json`, `public/aircraft/<id>/*.glb`, `public/jsbsim-data/aircraft/<id>/*.xml`, station/hardpoint & loadout preset config, optional `crates/control-law/` Rust crate, validation script, GitHub Pages deploy workflow. |
+| **`0SFS/mod-template-engine`** | `"engine"` | `0sfs-mod`, `0sfs-engine-mod` | `"declarative"` (optional `"wasm"` for FADEC) | `public/0sfs-mod.json`, `public/jsbsim-data/engine/*.xml`, optional `public/aircraft/<id>/engine/*.glb` (`full` + `installed`), nozzle rig & exhaust optical/gas support definitions, rotor blade counts, acoustic profile. |
+| **`0SFS/mod-template-payload`** | `"payload"` | `0sfs-mod`, `0sfs-payload-mod` | `"declarative"` (optional `"wasm"` for guidance/ballistics) | Single-item payload template (for one weapon, bomb, missile, pod, or external fuel tank): `public/0sfs-mod.json`, optional `public/payloads/<key>/*.glb` (or procedural cylinder/box dimensions), mass, drag area, capacity/rounds, and provenance notices. |
+| **`0SFS/mod-template-plugin`** | `"plugin"` | `0sfs-mod`, `0sfs-plugin-mod` | **`"wasm"` (Rust default)**; `"js"` fallback documented separately | `Cargo.toml` (`crate-type = ["cdylib"]`, `wasm32-unknown-unknown`, zero-allocation `#![no_std]`-friendly guest SDK), `public/0sfs-mod.json`, `public/mod.wasm`, GitHub Action that compiles Rust $\to$ `.wasm`, verifies exports, and publishes to GitHub Pages. |
 
 ---
 
@@ -297,10 +297,12 @@ In `fly/src/flight/createFlightSimApp.ts`, `createAboutPanel` reads `#foss-earth
 ### 7.1 GitHub Topic Tagging & Unauthenticated Discovery
 - Every `0SFS` mod and template repository must be tagged with GitHub topics:
   - Universal topic: **`0sfs-mod`**
-  - Kind topic: **`0sfs-aircraft`**, **`0sfs-engine`**, **`0sfs-component`**, **`0sfs-payload`**, **`0sfs-plugin`**, or **`0sfs-modpack`**
-- The **Mods** tab includes a **Browse GitHub Mods** section that queries:
-  `GET https://api.github.com/search/repositories?q=topic:0sfs-mod&sort=stars&order=desc&per_page=30`
-- Results are cached in `sessionStorage` (with a 10-minute TTL and ETag support) so normal tab switches never hit GitHub's 60 req/hr unauthenticated rate limit.
+  - Kind topic: **`0sfs-aircraft-mod`**, **`0sfs-engine-mod`**, **`0sfs-component-mod`**, **`0sfs-payload-mod`**, **`0sfs-plugin-mod`**, or **`0sfs-modpack-mod`**
+- The **Mods → Add mod** field searches repository names and descriptions as the user types. It also accepts GitHub URLs and `owner/repo` sources directly. Category filters add the matching kind topic; forks are included and templates are excluded.
+- Empty input browses tagged mods by stars; text searches use GitHub's relevance ranking. Requests go to `GET https://api.github.com/search/repositories`, with `topic:0sfs-mod`, the selected kind topic, `fork:true`, `template:false`, and `per_page=30`.
+- Results are cached for ten minutes in memory and optional `sessionStorage`, with ETag revalidation. A shared request budget and GitHub's reset/retry headers enforce the unauthenticated repository search limit of [10 requests per minute](https://docs.github.com/en/rest/search/search#rate-limit).
+- Aircraft include drones; engines include electric motors and drone propulsion; components include cameras, gimbals, propellers and shared flight components. Existing short category topics may remain for older clients, but the current filters use the `0sfs-{kind}-mod` topics.
+- The public [modding guide](../modding.md) is the installation and topic-tagging reference for users and mod authors.
 
 ### 7.2 Ownership Verification & Security Warnings
 
@@ -347,7 +349,7 @@ flowchart TD
 
 ### 8.2 Eight Individual Payload Mod Repositories (`0SFS/mod-template-payload`)
 
-Each selectable weapon, pod, and external fuel tank is extracted into its own dedicated repository in `/Users/felg/gh/0sfs/<repo>` (structured from `0SFS/mod-template-payload`, tagged `0sfs-mod` and `0sfs-payload`):
+Each selectable weapon, pod, and external fuel tank is extracted into its own dedicated repository in `/Users/felg/gh/0sfs/<repo>` (structured from `0SFS/mod-template-payload`, tagged `0sfs-mod` and `0sfs-payload-mod`):
 
 | New Payload Repository | Mod ID | `payloadType` | Item Data Migrated Into `public/0sfs-mod.json` (& `public/`) |
 | :--- | :--- | :--- | :--- |
@@ -383,7 +385,7 @@ Each selectable weapon, pod, and external fuel tank is extracted into its own de
    - Add a **Mods** tab in the simulator's tabbed interface showing:
      1. **Installed Mods & Dependency Tree** (Aircraft $\to$ Engines & Individual Payloads)
      2. **Add Mod by URL / GitHub Shorthand** (with ownership check & Security Warning modal)
-     3. **Browse GitHub Mods (`topic:0sfs-mod`)** (filterable by `All`, `Aircraft`, `Engines`, `Components`, `Payloads`, `Plugins`, `Modpacks`)
+     3. **Search and add GitHub mods (`topic:0sfs-mod`)** in one field (filterable by `All`, `Aircraft`, `Engines`, `Components`, `Payloads`, `Plugins`, `Modpacks`)
      4. **Share Modded Flight Link** (`?mods=...`)
 
 ---
