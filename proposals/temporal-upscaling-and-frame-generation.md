@@ -1,9 +1,11 @@
 # Temporal upscaling and display-rate frame generation
 
-Status: **proposal. P8 and P9 have shipped as the analytical fallback. Neural frame generation and neural super-resolution stay stopped. This is the next renderer stage.**
-Date: **2026-11-04**.
+Status: **proposal. First stage is power on a 60 Hz panel. Temporal upscaling and frame generation follow, and they are not how a 60 Hz MacBook Air saves power.**
+Date: **2026-11-04**. Revised **2026-11-07** for the low-end stage.
 
 This replaces the idea that EASU plus a camera warp is how 0sfs matches a native game. EASU stays. It is the fallback for a frame that has no motion vectors, and for WebGL1. The quality path is a temporal upscaler with the same inputs as FSR 3.1. Frame generation is one extra presented frame on a high-refresh display, using those same vectors, and it does not pretend to be DLSS 4.5 multi-frame generation.
+
+The machine this starts on is a 60 Hz M5 MacBook Air. Frame generation has no slot there. The power levers are the ones already named in the backlog: how many pixels a frame shades, and how many of the display's refreshes we actually draw. Stage A sets those. Stages B and C are the temporal upscaler and frame generation, and they wait until Stage A has a watt number.
 
 Owners: the passes, settings, and pure controllers live in `@foss-earth/renderer`. Flight registers the meshes that must not be warped (the cockpit screen, glass, precipitation, clouds) through a host port. The renderer does not import `0sfs`.
 
@@ -59,11 +61,88 @@ WebNN on the M5 does not join this list. Chrome's `npu` device is Core ML with e
 
 ## 2. Decision
 
-Ship a WGSL reimplementation of the FSR 3.1 temporal upscaler, fed by real motion vectors, with EASU kept exactly as it is when those vectors are absent. Add frame generation as a second stage that is off by default, refuses to run below a 60 fps rendered base, and presents at most one generated frame per rendered frame on a display whose refresh is at least 100 Hz.
+Three stages, in this order:
+
+1. **Stage A, now.** On a 60 Hz panel, present 30 times a second, on every other refresh, and draw at half the linear device resolution with EASU + RCAS. Physics stays at 120 Hz. Nothing about this is silent: the user turns the power preset on. The first machine we qualify is the M5 Air.
+2. **Stage B.** The FSR 3.1 temporal upscaler, once half-resolution EASU looks too soft on that same panel. EASU remains the fallback when a frame has no motion vectors.
+3. **Stage C.** Frame generation, off by default, only when the measured refresh is at least 100 Hz and the rendered base holds 60. A 60 Hz Air never enters this stage.
 
 Do not port DLSS, FSR 4, XeSS, or MetalFX. Do not turn Babylon's `TAARenderingPipeline` on. Do not put another ONNX model in the frame.
 
-The pixel saving is the same shape as native games, and it shows up when shading dominates: a 2× display, a 4K-class canvas, a headset. It does not show up on the audited `/fly/` view. That view, 1280×800 at DPR 1 on the M5, held 58.8 fps with 6.22 ms of main-thread work and a 3.0 ms globe pass, and the GPU process was at 13% of a core. An upscaler cannot shrink imagery selection, tile work, or terrain raycasts. Frame generation cannot invent an animation callback the main thread missed.
+The audited `/fly/` view does not justify Stage A by itself. That view was 1280×800 at DPR 1, 58.8 fps, 6.22 ms of main-thread work, a 3.0 ms globe pass, and the GPU process at 13% of a core. A 13-inch Air panel is 2560×1664 device pixels, about four times that many pixels, and a 15-inch panel is 2880×1864. Confirm which panel the machine has before quoting a watt delta. The audit's main-thread cost does not shrink when we draw fewer pixels. The GPU cost does, and so does the cost of waking the chip to draw a frame we then throw at a 60 Hz glass.
+
+---
+
+## 2.1 Stage A: 30 presents a second, at half resolution, on a 60 Hz panel
+
+### What is already true
+
+`renderer.frameRateCap` exists. Default `"off"`. A numeric cap becomes `minFrameIntervalMs = 1000 / cap` in `createGlobeRuntime`, and `createRenderScheduler` skips `tick` when `time - lastPresentedAt < interval - 1`. The clock is the animation callback, so the skip is tied to the display rather than to a `setTimeout`. That is the right clock. Two holes remain.
+
+A skipped callback still runs `work` when work is queued, and if rendering is continuous it schedules another callback immediately because `renderRequested` stays true. The GPU does not draw. The main thread still wakes at the full refresh. Stage A has to show, on a trace, that the skipped callback does not render, does not run EASU, and does not decode or upload tiles. Physics is allowed to keep stepping. Input is allowed to be read. Everything else on that callback is a power leak.
+
+The second hole is the number 40. The backlog's battery cap is "30 or 40, rounded to divide 120 Hz physics," and it warns that 30 on a 60 Hz panel judders if the presents are not whole refreshes. On a 60 Hz panel the legal present rates are the divisors of 60: 60, 30, 20, 15, 10. A requested 40 does not land on a refresh. The scheduler waits until the next callback whose timestamp clears `1000/40 - 1` ms, which on a steady 16.7 ms cadence is every second callback, so the picture is 30 anyway. On a 120 Hz panel, 40 is exact: every third refresh. The cap has to be quantized to the measured refresh before it is applied, or a 60 Hz Air and a 120 Hz display silently mean different things by the same setting.
+
+### Cadence
+
+Pure function, no DOM, next to the scheduler's interval test:
+
+```
+presentEvery(refreshHz, requestedFps) =
+  the smallest integer n ≥ 1 such that refreshHz / n ≤ requestedFps
+```
+
+Actual rate is `refreshHz / n`. Examples that the test locks:
+
+| Refresh | Requested | n | Presented |
+| --- | --- | --- | --- |
+| 60 | 60 | 1 | 60 |
+| 60 | 40 | 2 | 30 |
+| 60 | 30 | 2 | 30 |
+| 60 | 20 | 3 | 20 |
+| 120 | 40 | 3 | 40 |
+| 120 | 30 | 4 | 30 |
+
+`n` is counted in animation callbacks, not in milliseconds. Callback `k` presents when `k % n === 0`. A late callback does not "catch up" by presenting twice. The 1 ms jitter allowance in the scheduler stays, so a 16.6 ms stamp still counts as the same refresh slot. Measuring refresh is the median spacing of the last 30 callbacks, the same idea as the frame-generation gate later. Until 30 callbacks exist, treat the panel as 60 Hz, which is the safe quantization (it never presents faster than requested).
+
+JSBSim stays at 120 Hz. At a presented 30, that is four physics steps per picture. The picture may be new only on the present callback. Interpolating the visual pose between physics steps is already a separate problem. Stage A does not add a second clock and does not slow the flight model to 30.
+
+### Pixels
+
+`renderer.resolutionScale` is pixels drawn per display pixel. On a 2× Air, scale 1 draws every device pixel, four times the CSS-pixel count. Scale 0.5 draws one pixel per CSS pixel, a quarter of the fragments, and the hardware scale becomes `1 / (2 × 0.5) = 1`.
+
+While the power preset is on and the upscaler can run (WebGPU or WebGL2):
+
+- `renderer.resolutionScale = 0.5`
+- `renderer.upscaling = "easu-rcas"`
+- the canvas stays at device pixels (`hardware scale = 1 / devicePixelRatio`), and EASU writes those device pixels from the half-resolution scene
+
+That is the shipped P9 path. The browser must not also bilinear-stretch a small canvas. WebGL1 cannot run EASU. On WebGL1 the same preset still sets scale 0.5 and leaves upscaling off, and the note already says spatial upscaling is unavailable. The picture is softer. The pixel cut remains.
+
+`renderer.dynamicResolution` stays off in this preset. Its budget is `renderer.targetFps` (default 60) and it only drops the scale when the GPU is over that budget. An Air whose GPU is inside 13 ms would sit at the ceiling and save nothing. The preset is a chosen ceiling, not a governor. If the user turns dynamic resolution on as well, the governor's frame budget is the presented interval (`1000 / actualPresentFps`), not `targetFps`, so a 30 Hz present cannot be scored against a 60 Hz GPU budget.
+
+Antialiasing stays where the user left it in Stage A. `renderer.antialias` does not apply live. Turning it off is backlog P3 and a reload, not this change.
+
+### The preset
+
+One setting, `renderer.powerSave`, boolean, default false. Home: renderer tab, main section, main level. Applies live. Description, one sentence: draws half as many pixels along each edge and presents on half of a 60 Hz panel's refreshes, to use less power.
+
+Turning it on writes the three values above through the existing settings, and remembers what it overwrote so turning it off puts those three back. It does not write them again if the user then moves resolution, upscaling, or the frame cap by hand. That hand edit wins, and the preset reports off. This is the same rule as the backlog's battery hint: offer the saving, never keep steering after the user has chosen.
+
+On a 60 Hz panel the frame cap it requests is 30, which quantizes to every second refresh. On a faster panel the same preset still requests 30 presented frames, quantized by the table above, so a 120 Hz display presents every fourth refresh and does not stay at 60. The pixel half applies at any refresh. Frame generation is forced off while the preset is on. `renderer.targetFps` is left alone.
+
+Chrome may see `navigator.getBattery()` and offer the preset when the machine is unplugged. Safari cannot. The offer is a note on the setting, not a write. Low Power Mode is not detectable from the page. We do not guess it.
+
+### What we measure before calling it done
+
+On the M5 Air, brightness fixed, on battery, the same approach twice: preset off, then preset on. The power harness in the backlog is still unqualified, so the first accepted number is whole-machine battery discharge plus the presented frame times, not a modeled watt estimate. Record:
+
+- presented frames per second, which must sit on 30, not on 40 and not on a mix of 30 and 60
+- GPU time of a presented frame, and confirmation that the skipped callback's GPU time is zero
+- main-thread time of a presented callback and of a skipped callback
+- the resolution the scene rendered at, and that EASU's output size is the device-pixel canvas
+
+The backlog's estimate for the frame cap alone is 30 to 50 percent less power. Stage A does not claim that number until this machine produces one. If the skipped callback's main thread is still most of a presented callback, the cap is not saving what we think and the leak gets fixed before any temporal work starts.
 
 ---
 
@@ -230,7 +309,13 @@ A device loss drops the history and the velocity targets (`suspend` already exis
 
 ## 7. Files
 
-Pure, exported from `src/index.ts`:
+Stage A, before the temporal files:
+
+- `src/presentCadence.ts`, pure. `presentEvery(refreshHz, requestedFps)` as in section 2.1, with the table as unit tests. No DOM.
+- The scheduler consumes that `n` and presents when the callback index matches, instead of only comparing raw millisecond gaps. Skipped callbacks do not call the world tick.
+- `renderer.powerSave` in `src/settings/catalogue.ts`, wired from the lifecycle or the globe runtime that already owns `minFrameIntervalMs`. Turning it on and off restores resolution, upscaling, and the frame cap as section 2.1 says.
+
+Pure, exported from `src/index.ts`, for Stages B and C:
 
 - `src/temporalUpscale.ts`. Preset to scale. Phase count. Halton jitter. History weight given vector length, reactive flag, and disocclusion. Rung list for the controller.
 - `src/frameGeneration.ts`. The gate in section 5.2. No engine types.
@@ -255,9 +340,10 @@ Settings copy stays in the catalogue's voice. One sentence each. Pixel-changing 
 ## 8. Out of scope
 
 - DLSS, FSR 4, XeSS, MetalFX, and any ONNX or WebNN model, including another look at RIFE or RT4KSR.
-- Multipliers above 2×, and frame generation on displays slower than 100 Hz.
-- Changing the 0.05 dynamic-resolution behavior while the upscaler is EASU.
-- Turning the feature on by default, or advertising it as DLSS.
+- Multipliers above 2×, and frame generation on displays slower than 100 Hz. The M5 Air is in this bucket.
+- Changing the 0.05 dynamic-resolution behavior while the upscaler is EASU and the power preset is off.
+- Turning the power preset, temporal upscaling, or frame generation on by default, or advertising any of them as DLSS.
+- Slowing JSBSim below 120 Hz to save power.
 - A swapchain of our own. If a future browser API lets a page present twice per callback, this design is the one that can use it. Until then the off-tick is the API.
 
 ---
@@ -266,6 +352,7 @@ Settings copy stays in the catalogue's voice. One sentence each. Pixel-changing 
 
 1. This file.
 2. `docs/proposals/spatial-upscaling-and-dynamic-resolution.md`, for the neural gates and the reason EASU shipped.
-3. `foss-earth/renderer/src/settings/catalogue.ts`, `src/dynamicResolution.ts`, `src/spatialUpscaling.ts`, `src/babylon/spatialUpscalingPostProcess.ts`, `src/babylon/frameProfiler.ts`, `src/babylon/rendererLifecycle.ts`.
-4. AMD's FSR 3.1 upscaler and frame-generation pages, and the optical-flow technique note, for the algorithm. Reimplement it. Do not copy the SDK into the repository.
-5. `fly/src/flight/cockpit/cockpitScreen.ts`, for the mesh that must be redrawn after a generated frame.
+3. `foss-earth/renderer/src/settings/catalogue.ts`, `src/renderScheduler.ts`, `src/dynamicResolution.ts`, `src/spatialUpscaling.ts`, `src/babylon/spatialUpscalingPostProcess.ts`, `src/babylon/frameProfiler.ts`, `src/babylon/rendererLifecycle.ts`, and `foss-earth/engine/src/babylon/createGlobeRuntime.ts` where `minFrameIntervalMs` is derived from `renderer.frameRateCap`.
+4. `foss-earth/docs/docs/optimization-backlog.md` items P1 and P4, which Stage A is the concrete form of.
+5. AMD's FSR 3.1 upscaler and frame-generation pages, and the optical-flow technique note, for Stages B and C. Reimplement the algorithm. Do not copy the SDK into the repository.
+6. `fly/src/flight/cockpit/cockpitScreen.ts`, for the mesh that must be redrawn after a generated frame.
