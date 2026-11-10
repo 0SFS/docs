@@ -26,7 +26,7 @@ We would appreciate feedback on the browser/WASM integration and on our plan to
 make aircraft-definition provenance explicit. Thank you to the JSBSim
 maintainers and contributors for the flight-dynamics work this builds on.
 
-## Babylon.js forum — Demos and projects
+## Babylon.js forum — [Demos and projects](https://forum.babylonjs.com/c/demos/9)
 
 **Title:** 0SFS — an open-source browser flight simulator with Babylon.js and JSBSim WASM
 

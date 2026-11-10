@@ -34,9 +34,16 @@ discovery topics. An unpinned GitHub source loads the published GitHub
 Pages manifest. A tag or branch source loads `public/0sfs-mod.json` from
 that ref. Other assets must be available at the paths the manifest names.
 
-The development server also offers **This computer** for supported local
-checkouts. That mode loads the checkout through the dev server and does
-not search GitHub.
+The development server also offers **This computer** for a checkout on this
+computer. Choose it and enter `owner/repo`. That loads the checkout through
+the dev server and does not search GitHub. The GitHub choice is the default,
+and an `owner/repo` entered there loads the published GitHub Pages manifest.
+A repository that has not been published yet answers 404 from
+`https://owner.github.io/repo/0sfs-mod.json`. Use **This computer** until
+Pages is published.
+
+A new mod is added from the Mods tab. It is not part of the default modpack
+unless it is meant to ship with every flight.
 
 GitHub limits unauthenticated repository searches to
 [10 requests per minute](https://docs.github.com/en/rest/search/search#rate-limit).
