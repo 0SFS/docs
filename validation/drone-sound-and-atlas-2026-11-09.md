@@ -1,6 +1,6 @@
 # Drone Sound Tuning and DSP Optimization Ledger
 
-9 November 2026. Procedural electric sound synthesis and 2D imagery atlas texture-array refactoring validation.
+9 November 2026. Procedural electric sound synthesis, live UI tuning sliders, and 2D imagery atlas texture-array refactoring validation.
 
 ## 1. 2D Imagery Atlas Texture Array (`@foss-earth/renderer` & `@foss-earth/engine`)
 
@@ -36,10 +36,13 @@
    - Tuned `broadbandGain` to `0.11` on DJI Mini 2 and `0.14` on DJI Air 2S, with a gentle `0.82x` trim on Low so the air rush stays balanced with the tonal fundamental.
 4. **DSP Performance**:
    - Hoisted control-rate math (`sqrt()`, 2 filter-coefficient divisions, anti-aliasing clamps, harmonic weights) to update every `CONTROL_STRIDE = 8` samples (or immediately on reset / tier change), cutting per-sample inner-loop work by ~70% while maintaining exact sample-for-sample parity between Rust/WASM and TypeScript.
+5. **Live Electric Acoustic Tuning Sliders (`@0sfs/sound` & `@0sfs/electric-sound`)**:
+   - Updated [`osfs_voice_commit_profile`](file:///Users/felg/gh/0sfs/electric-sound/wasm/crates/electric-sound/src/lib.rs#L234-L253) and [`configure`](file:///Users/felg/gh/0sfs/electric-sound/src/reference.ts#L132-L143) so re-committing a profile on an already-configured voice updates `voice.profile` and `voice.control_countdown = 0` in-place without calling `voice.reset()`, eliminating oscillator phase/gate clicks during live slider drags.
+   - Added `patchElectricTuning` and `electricTuning` status reporting in [`createFlightAudio.ts`](file:///Users/felg/gh/0sfs/sound/src/createFlightAudio.ts) and four real-time sliders (`Tonal blade-passage gain`, `Broadband air rush gain`, `Motor mechanical whine gain`, `Propulsion output gain`), `Reset drone tuning`, and `Copy mod JSON` in [`SoundSettingsPanel.tsx`](file:///Users/felg/gh/0sfs/sound/src/SoundSettingsPanel.tsx).
 
 ---
 
 ## 3. Verification & Build Receipts
-- `@0sfs/electric-sound`: `npm run build:wasm` compiled `wasm/single/electric-sound.wasm` (23,014 bytes, SHA-256 `842e63a6...`), `npm run check:wasm` verified receipts, `npm test` passed 9/9 unit and parity tests, and `npm run references` generated hover and ramp WAV references.
-- `@0sfs/sound`: `node scripts/verify-audio-artifact.mjs` passed with zero drift; `npx vitest run tests/electricAudio.integration.test.ts` passed 17/17 tests.
+- `@0sfs/electric-sound`: `npm run build:wasm` compiled `wasm/single/electric-sound.wasm` (23,041 bytes, SHA-256 `2893e31c...`), `npm run check:wasm` verified receipts, `npm test` passed 10/10 unit and parity tests, and `npm run references` generated hover and ramp WAV references.
+- `@0sfs/sound`: `node scripts/verify-audio-artifact.mjs` passed with zero drift; all 19 test files (258 tests) in `sound/tests/` passed.
 - `@0sfs/fly`: full production build (`npm run build`) completed successfully with verified JSBSim and Audio artifacts.
